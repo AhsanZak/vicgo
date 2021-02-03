@@ -1,0 +1,114 @@
+{% load static %}
+<!doctype html>
+
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Update Product</title>
+
+    <link href="{% static 'assets/vendor/bootstrap4/css/bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'assets/css/auth.css' %}" rel="stylesheet">
+
+    <style>
+        .image-preview{
+            width: 300px;
+            min-height: 200px;
+            border: 2px solid #dddddd;
+            margin-top: 15px;
+
+            /*-defaullt text -*/
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #cccccc;
+
+        }
+
+        .image-preview__image{
+            /* display: none; */
+            width: 100%;
+        
+        }
+    </style>
+
+</head>
+<body>
+    <div class="wrapper">
+        <div class="auth-content">
+            <div class="card">
+                <div class="card-body text-center">
+                    <div class="mb-4">
+                    </div>
+
+                    <form action="{% url 'edit_product' product.id %}" method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+                         <div class="form-group">
+                            <input type="text" class="form-control" name="product_name" placeholder="Product Name" value="{{product.product_name}}" required>
+                        </div>
+                         <div class="form-group">
+                            <input type="text" class="form-control" name="product_category" placeholder="Product Category" value="{{product.product_category.category_name}}" required>
+                        </div>
+                        <div class="form-group">
+                            <input type="text" class="form-control" name="product_description" placeholder="Product Description" value="{{product.product_description}}" required>
+                        </div>
+                        <div class="form-group">
+                            <input type="number" class="form-control" name="product_price" placeholder="Product Price" value="{{product.product_price}}" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Edit Image Here</label>
+                            <input type="file" name="imageInput" id="imageInput" value="Upload" placeholder="" >
+                        </div>
+                        <div class="form-group image-preview" id=imagePreview >
+                            <img class="image-preview__image" alt="Image Preview" src="{{product.ImageURL}}" name="imageInput">
+                            <span class="image-preview__default-text"></span>
+                        </div>
+
+                        <button class="btn btn-primary shadow-2 mb-4">Update Product</button>
+
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const imageInput = document.getElementById("imageInput");
+        const previewContainer = document.getElementById("imagePreview");
+        const previewImage = previewContainer.querySelector(".image-preview__image");
+        const previewDefaultText = previewContainer.querySelector(".image-preview__default-text");
+
+        imageInput.addEventListener("change", function(){
+            const file = this.files[0];
+
+            if (file){
+                const reader = new FileReader();
+
+                previewDefaultText.style.display = "none";
+                previewImage.style.display = "block";
+
+                reader.addEventListener("load", function() {
+                    console.log(this);
+                    previewImage.setAttribute("src", this.result);
+                    
+                });
+
+                reader.readAsDataURL(file);
+
+            } else {
+                previewDefaultText.style.display = null;
+                previewImage.style.display = null; 
+                previewImage.setAttribute("src", "{{product.ImageURL}}");
+            }
+        });
+    </script>
+
+    <script src="{% static 'assets/vendor/jquery3/jquery.min.js' %}"></script>
+    <script src="{% static 'assets/vendor/bootstrap4/js/bootstrap.min.js' %}"></script>
+
+</body>
+</html>
