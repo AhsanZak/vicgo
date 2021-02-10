@@ -1,0 +1,27 @@
+{% extends 'User/base.html' %}
+
+{% block title %}
+Order Items
+{% endblock %}
+
+{% block content %}
+                        <div class="box-body" style="padding-bottom: 20em;">
+                            <table width="100%" class="table table-hover" id="dataTables-example">
+                                <thead>
+                                    <tr>
+										<th style="color: black;">Sl.no</th>
+                                        <th style="color: black;">Products</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+								{% for item in orders %}
+                                    <tr>
+										<td style="color: black;">{{forloop.counter}}</td>
+                                        <td style="color: black;">{{item.product.product_name}}</td>
+
+                                    </tr>
+								{% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+{% endblock %}

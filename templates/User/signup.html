@@ -1,0 +1,59 @@
+{% extends 'User/base.html' %}
+
+{% block title %}
+Login
+{% endblock %}
+
+{% block content %}
+
+        <div class="modal-body modal-body-sub_agile">
+					<div class="modal_body_left modal_body_left1">
+                        <div class="container">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <h3 class="agileinfo_sign">Log In </h3>
+                                    <p>
+                                        Log In now, Let's start your Blvck Shopping. Don't have an account?
+                                        <a href="">
+                                            Sign Up Now</a>
+                                    </p>
+                                </div>
+                                <div class="col-md-4"></div>
+                                <div class="col-md-4">
+                                    {% for message in messages %}
+                                        <div class="message">
+                                            <h4>{{message}}</h4>
+                                        </div>
+                                    {% endfor %}
+                                    <form action="#" method="post">
+                                        {% csrf_token %}
+                                         <div class="form-group">
+                                            <input type="text" class="form-control" name="first_name" placeholder="First Name" required>
+                                        </div>
+                                         <div class="form-group">
+                                            <input type="text" class="form-control" name="last_name" placeholder="Last Name" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <input type="text" class="form-control" name="username" placeholder="Username" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <input type="email" class="form-control" name="email" placeholder="Email" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <input type="text" class="form-control" name="mobile_no" placeholder="Mobile Number" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <input type="password" class="form-control" name="password1" placeholder="Password" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <input type="password" class="form-control" name="password2" placeholder="Confirm password" required>
+                                        </div>
+                                        <button class="btn btn-primary shadow-2 mb-4">Register</button>
+                                    </form>
+                                </div>
+                                <div class="col-md-4"></div>
+                            </div>
+                        </div>
+                    </div>
+				</div>
+{% endblock %}

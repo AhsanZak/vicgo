@@ -1,0 +1,189 @@
+{% extends 'User/base.html' %}
+{% load static %}
+{% block title %}
+Profile
+{% endblock %}
+
+{% block content %}
+
+<!---------------------Profile---------------------------->
+
+  <div class="container bootstrap snippet">
+      <div class="row">
+          <div class="col-sm-10" ></div>
+      </div>
+      <div class="row">
+        <div class="col-sm-12">
+            <div class="tab-content">
+              <div class="tab-pane active" id="home">
+                    <form class="form" action="{% url 'edit_userProfile' %}" method="POST" id="registrationForm"  enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="container">
+                            <div class="row" style="align-items: center;">
+                                <div class="col-md-4">
+                                    <div class="form-group image-preview" id=imagePreview style="align-items: center;">
+                                        <img class="image-preview__image" alt="Image Preview"  style="height:13em; width:13em;" src="{{profilepic.ImageURL}}" name="imageInput">
+                                        <span class="image-preview__default-text"></span>
+                                    </div>
+                                    <div class="form-group">
+                                        <h4 style="color:black;">{{username}}</h4>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Edit Image Here</label>
+                                        <input type="file" name="imageInput" id="imageInput" value="Upload" placeholder="" >
+                                    </div>
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="form-group">
+                                        <div class="col-xs-6" >
+                                            <label for="first_name"><h4 style="color:#FF5722;">Name</h4></label>
+                                            <input type="text" class="form-control" name="full_name" id="first_name" value="{{user.first_name}}" >
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="col-xs-6">
+                                          <label for="mobile"><h4 style="color:#FF5722;">Mobile</h4></label>
+                                            <input type="text" class="form-control" name="mobileNo" id="mobile" value="{{user.last_name}}">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+
+                                        <div class="col-xs-6">
+                                            <label for="email"><h4 style="color:#FF5722;">Email</h4></label>
+                                            <input type="email" class="form-control" name="email" id="email" value="{{user.email}}" >
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <button class="btn btn-lg btn-success" type="submit"><i class="glyphicon glyphicon-ok-sign"></i> Save</button>
+                                </div>
+                                </div>
+                            </div>
+                        </div>
+
+                  </form>
+             </div><!--/tab-pane-->
+            </div><!--/tab-content-->
+        </div><!---Col sm -12-->
+      </div><!--row-->
+  </div><!---/container-->
+  <!------------------------//Profile---------------------------------------->
+
+  <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLongTitle">Crop Image</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="box-2">
+            <div class="result"></div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button type="button" id="load" class="btn save btn-primary">Save changes</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+<!----Image Preview While selection --->
+    <script>
+        const imageInput = document.getElementById("imageInput");
+        const previewContainer = document.getElementById("imagePreview");
+        const previewImage = previewContainer.querySelector(".image-preview__image");
+        const previewDefaultText = previewContainer.querySelector(".image-preview__default-text");
+
+        imageInput.addEventListener("change", function(){
+            const file = this.files[0];
+
+            if (file){
+                const reader = new FileReader();
+
+                previewDefaultText.style.display = "none";
+                previewImage.style.display = "block";
+
+                reader.addEventListener("load", function() {
+                    console.log(this);
+                    previewImage.setAttribute("src", this.result);
+
+                });
+
+                reader.readAsDataURL(file);
+
+            } else {
+                previewDefaultText.style.display = null;
+                previewImage.style.display = null;
+                previewImage.setAttribute("src", "{{product.ImageURL}}");
+            }
+        });
+    </script>
+
+<!-- js-files -->
+<!-- jquery -->
+<script src="{% static 'web/js/jquery-2.1.4.min.js' %}"></script>
+<!-- //jquery -->
+<!---ImageCropping--->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/0.8.1/cropper.min.js"></script>
+  <script>
+
+    $("#img-button").click(function (e) {
+      $("#file-input").click();
+    });
+
+    let result = document.querySelector('.result'),
+      save = document.querySelector('.save'),
+      cropped = document.querySelector('.cropped'),
+      upload = document.querySelector('#file-input'),
+      cropper = '';
+
+    upload.addEventListener('change', (e) => {
+      if (e.target.files.length) {
+        // start file reader
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          if (e.target.result) {
+            // create new image
+            $("#exampleModalCenter").modal("show");
+            let img = document.createElement('img');
+            img.id = 'image';
+            img.src = e.target.result
+            // clean result before
+            result.innerHTML = '';
+            // append new image
+            result.appendChild(img);
+            // init cropper
+            cropper = new Cropper(img);
+          }
+        };
+        reader.readAsDataURL(e.target.files[0]);
+      }
+    });
+
+    save.addEventListener('click', (e) => {
+      e.preventDefault();
+      // get result to data uri
+      let imgSrc = cropper.getCroppedCanvas({
+        width: 300 // img disp value
+      }).toDataURL();
+      $("#exampleModalCenter").modal("hide");
+      cropped.src = imgSrc;
+      $('#imageBaseData').val(imgSrc)
+    });
+
+  </script>
+
+
+<!-- easy-responsive-tabs -->
+<link rel="stylesheet" type="text/css" href="{% static 'web/css/easy-responsive-tabs.css' %} "/>
+<script src="{% static 'web/js/easyResponsiveTabs.js' %}"></script>
+
+<script src="{% static 'web/js/bootstrap.js' %}"></script>
+
+
+{% endblock %}

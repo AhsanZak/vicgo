@@ -1,0 +1,103 @@
+{% extends 'User/base.html' %}
+{% load static %}
+
+{% block title %}
+Home
+{% endblock %}
+
+{% block content %}
+<!-- //w3l-banner-slider-main -->
+<section class="w3l-grids-hny-2">
+	<!-- /content-6-section -->
+	<div class="grids-hny-2-mian py-5" style="">
+		<div class="container py-lg-5">
+
+			<h3 class="hny-title mb-0 text-center"><span>C</span>ategories</h3>
+			<p class="mb-4 text-center">Handpicked Favourites just for you</p>
+			<div class="welcome-grids row mt-5">
+			{% for items in category %}
+				<div class="col-lg-2 col-md-4 col-6 welcome-image">
+						<div class="boxhny13">
+								<a href="{% url 'category_item' items.id %}">
+										<img src="{{items.ImageURL}}" style="height: 9rem; width:9rem;" class="img-fluid" alt="" />
+								<div class="boxhny-content">
+									<h3 class="title" href="">{{items.category_name}}</h3>
+								</div>
+							</a>
+						</div>
+						<h4><a href="">{{items.category_name}}</a></h4>
+				</div>
+				{% endfor %}
+			</div>
+
+		</div>
+	</div>
+</section>
+<!-- //content-6-section -->
+
+<section class="w3l-ecommerce-main">
+	<!-- /products-->
+	<div class="ecom-contenthny py-5">
+		<div class="container py-lg-5">
+			<h3 class="hny-title mb-0 text-center">Shop With <span>Us</span></h3>
+			<p class="text-center">Handpicked Favourites just for you</p>
+			<!-- /row-->
+			<div class="ecom-products-grids row mt-lg-5 mt-3">
+                {% for product in products %}
+				<div class="col-lg-3 col-6 product-incfhny mt-4">
+					<div class="product-grid2 transmitv">
+						<div class="product-image2">
+							<a href="{% url 'single' product.id %}">
+								<img class="pic-1 img-fluid" style="height: 23em; width: 20em;" src="{{product.ImageURL}}">
+								<img class="pic-2 img-fluid" style="height: 23em; width: 20em;" src="{{product.ImageURL}}">
+							</a>
+							<ul class="social">
+									<li><a href="{% url 'single' product.id %}" data-tip="Quick View"><span class="fa fa-eye"></span></a></li>
+
+									<li><a href="{% url 'add_cart' product.id %}" data-tip="Add to Cart"><span class="fa fa-shopping-bag"></span></a>
+									</li>
+							</ul>
+							<div class="transmitv single-item">
+									<button type="submit" class="transmitv-cart ptransmitv-cart add-to-cart">
+										<a href="{% url 'add_cart' product.id %}" style="color:white">Add to Cart</a>
+									</button>
+							</div>
+						</div>
+						<div class="product-content">
+							<h3 class="title"><a href="{% url 'single' product.id %}">{{product.product_name}} </a></h3>
+							<span class="price"><del></del>${{product.product_price}}</span>
+						</div>
+					</div>
+				</div>
+                {% endfor %}
+			</div>
+			<!-- //row-->
+		</div>
+	</div>
+</section>
+<!-- //products-->
+
+
+<section class="w3l-content-w-photo-6">
+	<!-- /specification-6-->
+	  <div class="content-photo-6-mian py-5">
+			 <div class="container py-lg-5">
+					<div class="align-photo-6-inf-cols row">
+
+						<div class="photo-6-inf-right col-lg-6">
+								<h3 class="hny-title text-left">All Branded Men's Suits are Flat <span>30% Discount</span></h3>
+								<p>Visit our shop to see amazing creations from our designers.</p>
+								<a href="#" class="read-more btn">
+										Shop Now
+								</a>
+						</div>
+						<div class="photo-6-inf-left col-lg-6">
+								<img src="{% static 'assets/images/1.jpg' %}" class="img-fluid" alt="">
+						</div>
+					</div>
+				 </div>
+			 </div>
+	 </section>
+   <!-- //specification-6-->
+
+{% endblock %}

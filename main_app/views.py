@@ -11,10 +11,10 @@ import base64
 
 def admin_panel(request):
     if request.session.has_key('password'):
-        # no_users = User.objects.count()
+        no_users = User.objects.count()
         x = 1000
-        # no_order = Order.objects.count()
-        # no_product = ProductDetail.objects.count()
+        no_order = Order.objects.count()
+        no_product = ProductDetail.objects.count()
 
         order = Order.objects.filter(date_ordered__range=['2020-10-01', '2030-01-01'])
         order_dict = {}
@@ -34,7 +34,7 @@ def admin_panel(request):
                 total_amount += items.total_price
 
         return render(request, 'AdminPanel/index.html',
-                      {'no_users': 1, 'x': x, 'no_order': 1, 'no_product': 1,
+                      {'no_users': no_users, 'x': x, 'no_order': no_order, 'no_product': no_product,
                        'total_revenue': total_amount})
     else:
         return redirect('/admin-login')
@@ -211,7 +211,6 @@ def create_product(request):
             product_category = Category.objects.get(category_name=request.POST['product_category'])
             product_description = request.POST['product_description']
             product_price = request.POST['product_price']
-            product_image = request.FILES.get('product_image')
             image_data = request.POST['pro_img']
 
             format, imgstr = image_data.split(';base64,')
@@ -224,7 +223,8 @@ def create_product(request):
             product.save()
             return redirect('/manage-product')
         else:
-            return render(request, 'AdminPanel/trial_CreateProduct.html')
+            category = Category.objects.all()
+            return render(request, 'AdminPanel/trial_CreateProduct.html', {'category': category})
     else:
         return redirect('/admin-login')
 
@@ -247,6 +247,7 @@ def edit_category(request, id):
         if request.method == 'POST':
             category = Category.objects.get(id=id)
             category.category_name = request.POST['category']
+            category.category_image = request.FILES['category_image']
             category.save()
             return redirect(manage_category)
         else:
@@ -258,8 +259,8 @@ def edit_category(request, id):
 def add_category(request):
     if request.method == 'POST':
         category_name = request.POST['category_name']
-        value = Category.objects.create(category_name=category_name)
-        value.save()
+        category_image = request.FILES['category_image']
+        Category.objects.create(category_name=category_name, category_image=category_image)
         return redirect(manage_category)
     else:
         return render(request, 'AdminPanel/add_category.html')

@@ -11,6 +11,7 @@ class UserDetail(models.Model):
     address = models.CharField(max_length=200, null=True)
     state = models.CharField(max_length=50, null=True)
     user_image = models.ImageField(null=True, blank=True)
+    wallet = models.IntegerField(null=True)
 
     @property
     def ImageURL(self):
@@ -23,6 +24,15 @@ class UserDetail(models.Model):
 
 class Category(models.Model):
     category_name = models.CharField(max_length=50, null=True)
+    category_image = models.ImageField(null=True, blank=True)
+
+    @property
+    def ImageURL(self):
+        try:
+            url = self.category_image.url
+        except ValueError:
+            url = ''
+        return url
 
 
 class ProductDetail(models.Model):

@@ -1,0 +1,161 @@
+{% extends 'User/base.html' %}
+
+{% block title %}
+Cart
+{% endblock %}
+
+{% block content %}
+	<!-- checkout page -->
+	<div class="privacy">
+		<div class="container">
+			<!-- tittle heading -->
+			<h3 class="tittle-w3l">Cart
+			</h3>
+			<!-- //tittle heading -->
+
+
+			<div class="row">
+				<div class="col-md-8">
+					<div class="checkout-right">
+						<h4>Your shopping cart contains:
+							<span></span>
+						</h4>
+						<div class="table-responsive">
+							<table class="timetable_sub">
+								<thead>
+									<tr>
+										<th>SL No.</th>
+										<th>Product</th>
+										<th>Quantity</th>
+										<th>Product name</th>
+										<th>Total Price</th>
+										<th>Remove</th>
+									</tr>
+								</thead>
+								<tbody>
+									{% for x in cart_data %}
+									<tr class="rem1">
+										<td class="invert">{{forloop.counter}}</td>
+										<td class="invert-image">
+												<img style="height:50px; width:60px;" src="{{x.product.ImageURL}}" alt=" "
+													class="img-responsive">
+										</td>
+										<td class="invert">
+											<div class="quantity">
+												<div class="quantity-select">
+													<button onclick="minus('{{x.id}}')">-</button>
+													<div class="entry value">
+														<span id="qty-{{x.id}}">{{x.quantity}}</span>
+													</div>
+													<button onclick="add('{{x.id}}')">+</button>
+												</div>
+											</div>
+										</td>
+										<td class="invert">{{x.product.product_name}}</td>
+										<td id="pro-price-{{x.id}}" class="invert">{{x.total_price}}</td>
+										<td class="invert">
+											<a href="{% url 'user_removeOrderItem' x.id %}" type="submit"
+												class="btn btn-outline-danger btn-rounded"
+												onclick="return confirm('Are you sure to Remove this item?')">
+												<i class="fa fa-trash-o" style="font-weight:bold; text-decoration:none; color:black"></i></a>
+										</td>
+									</tr>
+									{% endfor %}
+								</tbody>
+							</table>
+						</div>
+					</div>
+
+					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+					<div style="display: flex;">
+						<h5 style="width: fit-content; white-space: pre-wrap; color:black; font-weight:bold;">Total Amount : </h5><h5 id="total" style="width: fit-content; color:black; font-weight:bold;">{{total_amount}}</h5>
+					</div>
+
+							<div class="checkout-right-basket">
+								<button type="button" class="btn" data-toggle="modal" data-target=".bd-example-modal-lg"><a style="color: white;">Add Address
+									<span class="fa fa-hand-o-right" aria-hidden="true"></span>
+								</a></button>
+							</div>
+
+
+				</div>
+
+				<div class="col-md-4">
+					{% for x in address %}
+						<div class="col-md-4 p-4">
+							<div class="card" style="width: 18rem;">
+								<ul class="list-group list-group-flush">
+									<li class="list-group-item">{{x.address}}</li>
+									<li class="list-group-item">{{x.state}}</li>
+									<li class="list-group-item">{{x.city}}</li>
+									<a class="button2" href="{% url 'user_payment' x.id %}">Deliver To This Address</a>
+								</ul>
+							</div>
+						</div>
+						{% endfor %}
+				</div>
+
+
+			</div>
+
+
+		</div>
+	</div>
+
+
+<div class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      	<div class="container">
+		<div class="row">
+			<div class="col-md-6">
+				<form method='POST' action="{% url 'add_address' %}"
+					id="myForm" class="creditly-card-form agileinfo_form">
+
+					{% csrf_token %}
+
+					<div class="creditly-wrapper wthree, w3_agileits_wrapper">
+						<div class="information-wrapper">
+							<div class="first-row">
+
+								<div class="w3_agileits_card_number_grids">
+									<div class="w3_agileits_card_number_grid_left">
+
+										<div class="controls">
+											<input id="ida" value="" type="text" placeholder="Address" name="address"
+													required="">
+										</div>
+									</div>
+									<div class="w3_agileits_card_number_grid_right">
+										<div class="controls">
+											<input id="ids" type="text" placeholder="State" name="state" required="">
+										</div>
+									</div>
+									<div class="clear"></div>
+								</div>
+
+								<div class="controls">
+									<input id="idc" type="text" placeholder="Town/City" name="city" required="">
+								</div>
+
+							</div>
+						</div>
+					</div>
+					<div>
+						<button class="btn-success p-2 text-center" >Add Address</button>
+					</div>
+					&nbsp;
+
+				</form>
+
+			</div>
+			<div class="col-md-6"></div>
+		</div>
+	</div>
+
+    </div>
+  </div>
+</div>
+
+
+{% endblock %}

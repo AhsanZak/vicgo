@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'Adminpanel/base.html' %}
 
 {% block title %} Update Category {% endblock %}
 
@@ -69,10 +69,13 @@
 
                                   <h6 class="mb-4 text-muted">Update Category Name</h6>
 
-                                            <form action="{% url 'edit_category' category.id %}" method="POST" >
+                                            <form action="{% url 'edit_category' category.id %}" method="POST" enctype="multipart/form-data">
                                                 {% csrf_token %}
                                                  <div class="form-group">
                                                     <input type="text" class="form-control" name="category" placeholder="Category Name" value="{{category.category_name}}" required>
+                                                </div>
+                                                <div class="form-group">
+                                                    <input type="file" placeholder="Upload Image" name="category_image" accept="image/*" required>
                                                 </div>
                                                 <button class="btn btn-primary shadow-2 mb-4">Update Category</button>
                                             </form>

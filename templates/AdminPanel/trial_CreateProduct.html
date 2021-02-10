@@ -23,9 +23,6 @@
     <div class="wrapper">
 
         <nav id="sidebar" class="active">
-            <div class="sidebar-header">
-                <img src="" alt="bootraper logo" class="app-logo">
-            </div>
             <ul class="list-unstyled components text-secondary">
                 <li>
                     <a href="{% url 'dashboard' %}"><i class="fas fa-home"></i> Dashboard</a>
@@ -82,9 +79,6 @@
                             <div class="auth-content">
       <div class="card">
         <div class="card-body text-center">
-          <div class="mb-4">
-            <img class="brand" src="" alt="logo">
-          </div>
           <h6 class="mb-4 text-muted">Add a new product</h6>
 
           <form action="" method="POST" enctype="multipart/form-data">
@@ -102,9 +96,9 @@
             <div class="form-group">
               <label>Select Product Category</label>
               <select name="product_category">
-                <option>Tshirt</option>
-                <option>Hoodie</option>
-                <option>Jacket</option>
+                  {% for content in category %}
+                <option>{{content.category_name}}</option>
+                  {% endfor %}
               </select>
 
             </div>

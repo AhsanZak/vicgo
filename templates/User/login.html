@@ -1,0 +1,52 @@
+{% extends 'User/base.html' %}
+
+{% block title %}
+Login
+{% endblock %}
+
+{% block content %}
+
+        <div class="modal-body modal-body-sub_agile">
+					<div class="modal_body_left modal_body_left1">
+                        <div class="container">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <h3 class="agileinfo_sign">Log In </h3>
+                                    <p>
+                                        Log In now, Let's start your Blvck Shopping. Don't have an account?
+                                        <a href="{% url 'signup' %}">
+                                            Sign Up Now</a>
+                                    </p>
+                                </div>
+                                <div class="col-md-4"></div>
+                                <div class="col-md-4">
+                                    {% for message in messages %}
+                                        <div class="message">
+                                            <h4>{{message}}</h4>
+                                        </div>
+                                    {% endfor %}
+                                    <form action="{% url 'login' %}" method="POST">
+                                        {% csrf_token %}
+
+                                        <div class="form-group">
+                                            <div class="styled-input agile-styled-input-top">
+                                                <input style="color:black" type="text" class="form-control" placeholder="User Name" name="username" required="">
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <div class="styled-input">
+                                                <input style="color:black" type="password" class="form-control" placeholder="Password" name="password" required="">
+                                            </div>
+                                        </div>
+
+                                        <input type="submit" class="form-control" value="Log In">
+                                    </form>
+                                        <button type="submit" class="button2 form-control" ><a href="{% url 'otp_login' %}">Login with OTP</a></button>
+                                </div>
+                                <div class="col-md-4"></div>
+                            </div>
+                        </div>
+                    </div>
+				</div>
+{% endblock %}
