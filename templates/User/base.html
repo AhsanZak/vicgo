@@ -75,8 +75,9 @@
                   <a class="nav-link" href="/">Home</a>
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link" href="about.html">About</a>
+                  <a class="nav-link" href="">About</a>
                 </li>
+
                 <li class="nav-item">
                       <div class="dropdown">
                       <a class="nav-link dropdown-toggle" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -84,18 +85,18 @@
                       </a>
                       <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
                           {% if request.user.is_authenticated %}
+                        <a class="dropdown-item nav-link" href="{% url 'view_order' %}">Orders</a>
+                        <a class="dropdown-item nav-link" href="" style="cursor: pointer !important;">Wallet</a>
                         <a class="dropdown-item nav-link" href="{% url 'logout' %}">Logout</a>
                           {% else %}
                                                   <a class="dropdown-item nav-link" href="{% url 'login' %}">Login</a>
 
                           {% endif %}
-                        <a class="dropdown-item nav-link" href="{% url 'view_order' %}">Orders</a>
-                        <a class="dropdown-item nav-link" href="#">ss</a>
                       </div>
                     </div>
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link" href="contact.html">Contact</a>
+                  <a class="nav-link" href="">Contact</a>
                 </li>
               </ul>
 
@@ -149,7 +150,7 @@
 
                   <div class="right-side col-lg-8 pl-lg-5">
                       <h4>Women's Day Special Offer
-                        All Branded Sandals are Flat 50% Discount</h4>
+                        All Branded Hoodies are Flat 50% Discount</h4>
                       <div class="sub-columns">
                           <div class="sub-one-left">
                               <h6>Useful Links</h6>

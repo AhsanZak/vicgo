@@ -44,17 +44,16 @@ def login(request):
         username = request.POST['username']
         password = request.POST['password']
 
-        if User.objects.get(username=username).exists():
-            user = User.objects.get(username=username)
-            if user is not None and check_password(password, user.password):
-                if user.is_active == False:
-                    messages.info(request, 'User is Blocked')
-                else:
-                    auth.login(request, user)
-                    return redirect(home)
+        user = User.objects.filter(username=username).first()
+        if user is not None and check_password(password, user.password):
+            if user.is_active == False:
+                messages.info(request, 'User is Blocked')
             else:
-                messages.info(request, "Invalid Credentials")
-                return redirect(login)
+                auth.login(request, user)
+                return redirect(home)
+        else:
+            messages.info(request, "Invalid Credentials")
+            return redirect(login)
     else:
         return render(request, 'User/login.html')
 
@@ -209,9 +208,13 @@ def add_address(request):
             address = request.POST['address']
             state = request.POST['state']
             city = request.POST['city']
-            address = ShippingAddress.objects.create(user=user, address=address, state=state, city=city)
-            address.save()
-            return redirect(add_address)
+
+            if ShippingAddress.objects.filter(address=address).exists():
+                return redirect(add_address)
+            else:
+                address = ShippingAddress.objects.create(user=user, address=address, state=state, city=city)
+                address.save()
+                return redirect(add_address)
         else:
             return redirect(cart)
     else:

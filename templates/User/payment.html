@@ -5,71 +5,64 @@ Payment
 {% endblock %}
 
 {% block content %}
+    <div class="checkout-right p-5">
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<h4 style="text-align: center;">Order Summary</h4>
 
-<div class="checkout-right">
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<h4>Order Summary</h4>
-        <div class="table-responsive">
-            <table class="timetable_sub">
-                <thead>
-                    <tr>
-                        <th>SL No.</th>
-                        <th>Quantity</th>
-                        <th>Product Name</th>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-8">
+                <div class="table-responsive">
+                    <table class="timetable_sub">
+                        <thead>
+                            <tr>
+                                <th>SL No.</th>
+                                <th>Quantity</th>
+                                <th>Product Name</th>
 
-                        <th>Price</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for x in items %}
-                    <tr class="rem1">
-                        <td class="invert">1</td>
-                        <td class="invert">
-                            <div class="quantity">
-                                <div class="quantity-select">
-                                    <div class="entry value">
-                                        <span style="color:black;">{{x.quantity}}</span>
+                                <th>Price</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for x in items %}
+                            <tr class="rem1">
+                                <td class="invert">1</td>
+                                <td class="invert">
+                                    <div class="quantity">
+                                        <div class="quantity-select">
+                                            <div class="entry value">
+                                                <span style="color:black;">{{x.quantity}}</span>
+                                            </div>
+                                        </div>
                                     </div>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="invert">{{x.product.product_name}}</td>
-                        <td class="invert">${{x.get_total}}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    </div>
-    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-    <p style="color:black; font-weight:bold;">Total Amount = ${{total_price}}</p>
-    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                </td>
+                                <td class="invert">{{x.product.product_name}}</td>
+                                <td class="invert">${{x.get_total}}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                        <p style="color:black; font-weight:bold;">Total Amount = ${{total_price}}</p>
+                </div>
+                <div class="col-md-4">
+                    <!----------------------------Deliver-TO-Previosly-USed-Addresses------------------------------>
+                    <div class="container">
+                        <div class="card" style="width: auto">
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item" style="color:black; font-weight:bold;">{{address.address}}</li>
+                                <li class="list-group-item" style="color:black; font-weight:bold;">{{address.state}}</li>
+                                <li class="list-group-item" style="color:black; font-weight:bold;">{{address.city}}</li>
+                                <a style="text-align: center">Delivery Address<i class="fa-check"></i></a>
+                            </ul>
+                        </div>
+                    </div>
+                    <!----------------------------//Deliver-TO-Previosly-USed-Addresses------------------------------>
+                </div>
+            </div>
 
 
-
-    <!----------------------------Deliver-TO-Previosly-USed-Addresses------------------------------>
-    <div class="container">
-        <div class=""></div>
-        <div class="card" style="width: 18rem;">
-            <ul class="list-group list-group-flush">
-                <li class="list-group-item" style="color:black; font-weight:bold;">{{address.address}}</li>
-                <li class="list-group-item" style="color:black; font-weight:bold;">{{address.state}}</li>
-                <li class="list-group-item" style="color:black; font-weight:bold;">{{address.city}}</li>
-                <input type="text" id="address_id" hidden value="{{address.id}}">
-
-                <a>Delivery Address</a>
-            </ul>
-        </div>
-    </div>
-    <!----------------------------//Deliver-TO-Previosly-USed-Addresses------------------------------>
-
-    <div class="container">
-
-    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<p style="color:black">Payment Method :</p>
-
-    <form>
-        <div class="row">
+            <p style="color:black">Payment Method :</p>
+            <div class="row">
                 <div class="col-md-12">
                     <div style="display: flex;">
                         <input type="radio" id="cod" name="mode" value="COD" required>
@@ -82,19 +75,22 @@ Payment
                 </div>
                 <div class="col-md-12">
                     <div>
-                        <input style="width: 30vw;" id="order" type="button" value="Place Order" class="btn button2 ">
+                        <div class="checkout-right-basket">
+								<button type="button" id="order" class="btn" data-toggle="modal" data-target=".bd-example-modal-lg"><a style="color: white;">Place Order
+								</a></button>
+                        </div>
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div id="paypal-button-container"></div>
                 </div>
-            <input type="hidden" custom='Hidden Element' name="hidden">
+                <input type="hidden" custom='Hidden Element' name="hidden">
+            </div>
+
+
         </div>
-    </form>
 
-
-</div>
-
+    </div>
     <!-- Include the PayPal JavaScript SDK -->
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
