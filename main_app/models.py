@@ -49,3 +49,13 @@ class ProductDetail(models.Model):
         except ValueError:
             url = ''
         return url
+
+
+class RefferalOffer(models.Model):
+    reff_name = models.CharField(null=True, max_length=225)
+    reff_discount = models.IntegerField(null=True)
+    reff_price = models.IntegerField(null=True)
+    reffered_person_discount = models.IntegerField(null=True)
+    order_maximum = models.IntegerField(null=True)
+    reff_offer_type = models.CharField(null=True, max_length=225)
+    reff_status = models.BooleanField(null=True, default=True)

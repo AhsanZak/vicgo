@@ -91,6 +91,48 @@ def signup(request):
         return render(request, 'User/signup.html')
 
 
+def reffral_signup(request, reff_code):
+    if request.user.is_authenticated:
+        return redirect('/')
+    elif request.method == 'POST':
+        lastname = request.POST['lastname']
+        username = request.POST['username']
+        email = request.POST['email']
+        password = request.POST['password']
+        dic = {"lastname": lastname, "email": email, "username": username}
+
+        if User.objects.filter(username=username).exists():
+            messages.info(request, 'Mobile number already taken')
+            return render(request, 'refferal_signup.html', dic)
+
+        elif User.objects.filter(email=email).exists():
+            messages.info(request, 'Email is Taken')
+            return render(request, 'refferal_signup.html', dic)
+
+        else:
+            letter = string.ascii_letters
+            result = ''.join(random.choice(letter) for i in range(8))
+            if reff_code == "":
+                user = User.objects.create_user(last_name=lastname, username=username, email=email, password=password)
+                user.save()
+            else:
+                if Customer.objects.filter(reff_code=reff_code).exists():
+                    user = User.objects.create_user(last_name=lastname, username=username, email=email,
+                                                    password=password)
+                    user.save()
+                    cust = Customer.objects.get(reff_code=reff_code)
+                    customer, created = Customer.objects.get_or_create(user=user, name=username, email=email,
+                                                                       reff_code=result, refferd_user=cust.user_id)
+                    messages.info(request, 'User Created')
+                    return redirect('login')
+                else:
+                    messages.info(request, 'Wrong refferel code ')
+                    return render(request, 'refferal_signup.html', dic)
+            return redirect('login')
+    else:
+        return render(request, 'refferal_signup.html')
+
+
 def logout(request):
     if request.user.is_authenticated:
         print("loogeed out")
@@ -261,6 +303,7 @@ def user_payment(request, id):
         user = request.user
         cart = OrderItem.objects.filter(user=user)
         return render(request, 'User/checkout.html')
+
 
 
 def view_order(request):
