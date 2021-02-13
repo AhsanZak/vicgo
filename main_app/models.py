@@ -6,12 +6,8 @@ from django.contrib.auth.models import User
 class UserDetail(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
     mobile_no = models.BigIntegerField(null=True)
-    city = models.CharField(max_length=100, null=True)
-    pin_code = models.IntegerField(null=True)
-    address = models.CharField(max_length=200, null=True)
-    state = models.CharField(max_length=50, null=True)
     user_image = models.ImageField(default="profileDefault.jpg", null=True, blank=True)
-    wallet = models.IntegerField(null=True)
+    wallet = models.IntegerField(null=True, default="0")
 
     @property
     def ImageURL(self):

@@ -16,11 +16,17 @@ urlpatterns = [
     path('add-cart/<int:id>/', views.add_cart, name="add_cart"),
     path('cart', views.cart, name="cart"),
     path('cart/update/<int:id>', views.cart_update, name="cart_update"),
+    path('wallet/<int:id>/', views.wallet, name="wallet"),
 
     path('user-removeOrderItem/<int:id>', views.user_remove_order_item, name="user_removeOrderItem"),
     path('add-address', views.add_address, name="add_address"),
     path('user-payment/<int:id>', views.user_payment, name="user_payment"),
+    path('success-razorpay/', views.success_razorpay, name="success_razorpay"),
+    path('success-paypal/', views.success_paypal, name="success_paypal"),
+
+
     path('view-order/', views.view_order, name="view_order"),
     path('order-items/', views.order_items, name="order_items"),
+    path('cancel-order/<str:id>/', views.cancel_order_user, name="cancel_order_user"),
 
 ]

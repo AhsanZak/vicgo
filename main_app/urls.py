@@ -23,6 +23,11 @@ urlpatterns = [
     path('update-category/<int:id>', views.update_category, name="update_category"),
     path('edit-category/<int:id>', views.edit_category, name="edit_category"),
 
+    path('manage-refferal/', views.manage_refferal, name="manage_refferal"),
+    path('add-refferal/', views.add_refferal, name="add_refferal"),
+    path('edit-refferal/<int:id>/', views.edit_refferal, name="edit_refferal"),
+    path('delete-refferal/<int:id>/', views.delete_refferal, name="delete_refferal"),
+
     path('delete-user/<int:user_id>', views.delete_user, name='delete_user'),
     path('delete-product/<int:product_id>', views.delete_product, name='delete_product'),
     path('update-user/<int:user_id>', views.update_user, name='update_user'),

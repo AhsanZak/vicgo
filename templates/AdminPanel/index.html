@@ -23,6 +23,9 @@
                 <a href="{% url 'manage_order' %}"><i class="fas fa-user-friends"></i>Order</a>
             </li>
             <li>
+                <a href="{% url 'manage_refferal' %}"><i class="fas fa-user-friends"></i>Referral Offer</a>
+            </li>
+            <li>
                     <a href="{% url 'order_report' %}" ><i class="fas fa-user-shield"></i>Order Report</a>
             </li>
         </ul>
@@ -161,31 +164,16 @@
 
                 </div>
 
-
-
-<!------------------------------------------Graphs-------------------------------------------------------------->
-
-
-
+<!--------------------Graphs----------------------->
                 <div class="row">
                         <div class="col-md-6">
                             <canvas id="myChart"></canvas>
                         </div>
-
                         <div class="col-md-6">
                             <canvas id="bar"></canvas>
                         </div>
-
-
                 </div>
-
-
-
-
-<!----------------------------------//Graph------------------------------------------------------------------>
-
-
-
+<!---------=---------//Graph----------------------->
 
             </div>
         </div>

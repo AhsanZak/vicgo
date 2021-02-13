@@ -9,10 +9,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <title>Vicgo | {% block title %}{% endblock %}</title>
   <!-- Template CSS -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-  <link rel="stylesheet" href="{% static 'assets/css/style-liberty.css' %}">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">  <link rel="stylesheet" href="{% static 'assets/css/style-liberty.css' %}">
   <link href="{% static 'web/css/style.css' %}" rel="stylesheet" type="text/css" media="all" />
   <link rel="stylesheet" href="{% static 'assets/css/style-starter.css' %}">
+  <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css" integrity="sha384-AYmEC3Yw5cVb3ZcuHtOA93w35dYTsvhLPVnYs9eStHfGJvOvKxVfELGroGkvsg+p" crossorigin="anonymous"/>
 
 	<!-- Template CSS -->
   <link href="//fonts.googleapis.com/css?family=Oswald:300,400,500,600&display=swap" rel="stylesheet">
@@ -24,10 +24,8 @@
 </head>
 <body>
 
-<script async src='/js/autotrack.js'></script>
-
 <meta name="robots" content="noindex">
-<body><link rel="stylesheet" href="/assests/css/font-awesome.min.css">
+<body>
 
 <section class="w3l-banner-slider-main inner-pagehny">
   <div class="breadcrumb-infhny">
@@ -84,9 +82,9 @@
                       </a>
                       <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
                          {% if request.user.is_authenticated %}
-                        <a class="dropdown-item nav-link" href="{% url 'view_order' %}" style="color: black">Orders</a>
-                        <a class="dropdown-item nav-link" href="" style="color: black">Wallet</a>
-                        <a class="dropdown-item nav-link" href="{% url 'logout' %}" style="color: black">Logout</a>
+                        <a class="dropdown-item nav-link" href="{% url 'view_order' %}" style="color: black"><i class="fa fa-list-alt" aria-hidden="true"></i> &nbsp;Orders</a>
+                        <a class="dropdown-item nav-link" data-toggle="modal" data-target="#exampleModalCenter" style="color: black"><i class="fa fa-wallet" aria-hidden="true"></i> &nbsp; My Wallet</a>
+                        <a class="dropdown-item nav-link" href="{% url 'logout' %}" style="color: black"><i class="fa fa-sign-out" aria-hidden="true"></i> &nbsp; Logout</a>
                           {% else %}
                           <a class="dropdown-item nav-link" href="{% url 'login' %}" style="color: black">Login</a>
                           {% endif %}
@@ -116,6 +114,41 @@
     </div>
 </section>
 
+
+<!-- Wallet Modal -->
+<div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLongTitle">Your Wallet</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="container">
+          <div class="row">
+            <div class="col-md-6">
+                <h3 class="title">Balance</h3>
+            </div>
+            <div class="col-md-6">
+              <div class="col-md-6">
+                <h3 class="title">$ {{user_detail.wallet}}</h3>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-3"></div>
+            <div class="col-md-6 p-2">
+              <p class="mb-4 text-center">Share the Vicgo Shoppy links and increase your wallet..!</p>
+            </div>
+            <div class="col-md-3"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
 {% block content %}
 
@@ -297,13 +330,8 @@
 
 
   </html>
-<script>
-// optional
-		$('#customerhnyCarousel').carousel({
-				interval: 5000
-    });
-  </script>
- <!-- cart-js -->
+
+
  <script src="{% static 'assets/js/minicart.js' %}"></script>
  <script>
      transmitv.render();

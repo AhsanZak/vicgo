@@ -53,13 +53,14 @@ Payment
                                 <li class="list-group-item" style="color:black; font-weight:bold;">{{address.state}}</li>
                                 <li class="list-group-item" style="color:black; font-weight:bold;">{{address.city}}</li>
                                 <a style="text-align: center">Delivery Address<i class="fa-check"></i></a>
+                                <input type="text" id="address_id" hidden value="{{address.id}}">
+
                             </ul>
                         </div>
                     </div>
                     <!----------------------------//Deliver-TO-Previosly-USed-Addresses------------------------------>
                 </div>
             </div>
-
 
             <p style="color:black">Payment Method :</p>
             <div class="row">
@@ -76,8 +77,7 @@ Payment
                 <div class="col-md-12">
                     <div>
                         <div class="checkout-right-basket">
-								<button type="button" id="order" class="btn" data-toggle="modal" data-target=".bd-example-modal-lg"><a style="color: white;">Place Order
-								</a></button>
+                            <input style="width: 30vw;" id="order" type="button" value="Place Order" class="btn button2 ">
                         </div>
                     </div>
                 </div>
@@ -91,16 +91,17 @@ Payment
         </div>
 
     </div>
+
     <!-- Include the PayPal JavaScript SDK -->
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-
     <script
         src="https://www.paypal.com/sdk/js?client-id=AZ-zxKIWEzxYNP6RHnvei07eMWgRneZlEtCTRKXVnMBYSkZISPFsw0Y8WwftjBOb6n0BLn1x9mvFYN4X&currency=USD"
         data-namespace="paypal_sdk"></script>
     <script src="https://code.jquery.com/jquery-3.5.0.min.js"
         integrity="sha256-xNzN2a4ltkB44Mc/Jz3pT4iU1cmeR0FkXs4pru/JxaQ=" crossorigin="anonymous"></script>
+
     <script>
-        // Render the PayPal button into #paypal-button-container
+
         function paypal(tid) {
             paypal_sdk.Buttons({
 
@@ -122,22 +123,19 @@ Payment
                         console.log(details);
 
                         alert('Transaction completed by ' + details.payer.name.given_name + '!');
+                        console.log(tid);
                         successpaypal(tid)
-
                     });
                 }
-
-
             }).render('#paypal-button-container');
-
         }
 
         function successpaypal(tid) {
+            console.log(tid);
             var userData = {
                 csrfmiddlewaretoken: '{{ csrf_token }}',
                 tid: tid,
                 id: $('#address_id').val()
-
             }
             $.ajax({
                 url: '/success-paypal/',
@@ -152,65 +150,61 @@ Payment
             });
         }
 
+
         var amount = 0
-        $('#order').click(function () {
+        $('#order').click(function(){
             let id = $('#address_id').val()
-            console.log(id)
-            var userData = {
+                var userData = {
                 csrfmiddlewaretoken: '{{ csrf_token }}',
                 mode: $("input[name='mode']:checked").val()
-
-            }
+                }
 
             $.ajax({
-                url: '/user-payment/' + id,
+                url: '/user-payment/' + id, 
                 type: "POST",
                 data: userData,
-                dataType: "json",
-                success: function (data) {
+                dataType: "json",  
+                success: function (data){
                     if (data.mode == 'COD'){
-                        alert('Order Placed ..!!!')
-                        window.location.replace("/")}
-                    else if (data.mode == 'Paypal') {
+                        alert('Order Placed with COD ...!!')
+                        window.location.replace("/")
+                    }
+                    else if (data.mode == 'Paypal'){
                         console.log(data)
                         $('#order').hide()
                         $('#paypal-button-container').show()
                         paypal(data.tid)
                     }
-                    else if (data.mode == 'Razorpay') {
+                    else if (data.mode == 'Razorpay'){
                         console.log(data.mode)
                         tid = data.tid
                         $('#order').hide()
-                        // $('.razorpay-payment-button').click()
                         razorpay(tid)
                         amount = data.amount
                     }
-
                 }
             });
-
-
         });
-        function razorpay(tid) {
+
+
+        function razorpay(tid){
             console.log(tid)
-            // var tid =tid
             var total = '{{total_price}}'*7000
             var payment_status = 'razorpay'
             var options = {
                 "key": "rzp_test_U3zNUwvRlxDktr", // Enter the Key ID generated from the Dashboard
                 "amount": total, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
                 "currency": "INR",
-                "name": "Blvck Paris",
+                "name": "VICGO",
                 "description": "Test Transaction",
-                "image": "https://example.com/your_logo",
                  //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
                 "handler": function (response) {
                     console.log(tid)
                    success_razorpay(tid)
                 },
                 "prefill": {
-                    "name": "Gaurav Kumar",
-                    "email": "gaurav.kumar@example.com",
+                    "name": "{{user.first_name}}" + "{{user.last_name}}",
+                    "email": "{{user.email}}",
                     "contact": "9999999999"
                 },
                 "notes": {
@@ -221,28 +215,23 @@ Payment
                 }
             };
             var rzp1 = new Razorpay(options);
-            // document.getElementById('rzp-button1').onclick = function (e) {
             rzp1.open();
-            //     e.preventDefault();
-            // }
-
         }
 
-            function success_razorpay(tid) {
+        function success_razorpay(tid){
             var userData = {
                 csrfmiddlewaretoken: '{{ csrf_token }}',
                 tid: tid,
                 id: $('#address_id').val()
-
             }
             $.ajax({
-                url: '/success-razorpay/',
+                url: '/success-razorpay/', 
                 type: "POST",
                 data: userData,
                 dataType: "json",
-                success: function (data) {
-                    if (data == 'success') {
-                        alert('Payment success.. Order Placed!!!')
+                success: function(data){
+                    if (data == 'success'){
+                        alert('Payment Success.. Order Placed!')
                         window.location.replace("/")
                     }
                 }

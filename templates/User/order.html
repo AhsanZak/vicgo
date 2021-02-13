@@ -6,21 +6,23 @@ Cart
 
 {% block content %}
 
-<div class="container">
+<div class="container p-5">
     <div class="row">
+		<div class="col-md-8">
 		<div class="box-body" style="padding-bottom: 20em; overflow-x:auto;">
-			<table width="100%" class="table table-hover" id="dataTables-example">
-				<thead>
+			<table width="100%" class="table table-hover table-responsive  table-bordered" id="dataTables-example">
+				<thead class="thead-dark">
 					<tr>
-						<th style="color: black;">Sl.no</th>
-						<th style="color: black;">Order ON</th>
-						<th style="color: black;">Transaction ID</th>
-						<th style="color: black;">Address</th>
-						<th style="color: black;">Order Items</th>
-						<th style="color: black;">Price</th>
-						<th style="color: black;">Payment Mode</th>
-						<th style="color: black;">Payment Status</th>
-						<th style="color: black;">Order Status</th>
+						<th style="text-align: center;">Sl.no</th>
+						<th style="text-align: center;">Order ON</th>
+						<th style="text-align: center;">Transaction ID</th>
+						<th style="text-align: center;">Address</th>
+						<th style="text-align: center;">Order Items</th>
+						<th style="text-align: center;">Price</th>
+						<th style="text-align: center;">Payment Mode</th>
+						<th style="text-align: center;">Payment Status</th>
+						<th style="text-align: center;">Order Status</th>
+						<th style="text-align: center;">Cancel Order</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -38,15 +40,17 @@ Cart
 						<td style="color: black;">{{item.total_price}}</td>
 						<td style="color: black;">{{item.payment_mode}}</td>
 						<td style="color: black;">{{item.payment_status}}</td>
-						<td style="color: black;">
-							{{item.order_status}}
-						</td>
-
+						<td style="color: black;">{{item.order_status}}</td>
+						<td style="color: black;"><a href="{% url 'cancel_order_user' item.transaction_id %}">Cancel Order</a></td>
 					</tr>
 				{% endfor %}
 				</tbody>
 			</table>
 		</div>
+	</div>
+	<div class="col-md-4">
+		
+	</div>
 	</div>
 </div>
  {% endblock %}

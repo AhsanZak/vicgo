@@ -17,7 +17,8 @@ def home(request):
     products = ProductDetail.objects.all()
     category = Category.objects.all()
     if request.user.is_authenticated:
-        return render(request, 'User/index.html', {'products': products, 'category': category, 'user': request.user})
+        user_detail = UserDetail.objects.get(user=request.user)
+        return render(request, 'User/index.html', {'products': products, 'category': category, 'user': request.user, 'user_detail':user_detail})
     else:
         return render(request, 'User/index.html', {'products': products, 'category': category})
 
@@ -27,8 +28,9 @@ def category_item(request, item_id):
         category_items = Category.objects.get(id=item_id)
         products = ProductDetail.objects.filter(product_category=category_items.id)
         category = Category.objects.all()
+        user_detail = UserDetail.objects.get(user=request.user)
 
-        return render(request, 'User/index.html', {'products': products, 'category': category, 'user': request.user})
+        return render(request, 'User/index.html', {'products': products, 'category': category, 'user': request.user, 'user_detail':user_detail})
     else:
         return redirect(login)
 
@@ -36,7 +38,8 @@ def category_item(request, item_id):
 def single(request, product_id):
     product = ProductDetail.objects.get(id=product_id)
     category_product = ProductDetail.objects.filter(product_category=product.product_category)
-    return render(request, 'User/single.html', {'product': product, 'category_product': category_product})
+    user_detail = UserDetail.objects.get(user=request.user)
+    return render(request, 'User/single.html', {'product': product, 'category_product': category_product, 'user_detail':user_detail})
 
 
 def login(request):
@@ -89,6 +92,14 @@ def signup(request):
             return render(request, 'User/signup.html')
     else:
         return render(request, 'User/signup.html')
+
+
+def wallet(request, id):
+    if request.user.is_authenticated:
+        user = User.objects.get(id=id)
+        pass
+    else:
+        return redirect(login)
 
 
 def reffral_signup(request, reff_code):
@@ -146,7 +157,8 @@ def user_profile(request):
     if request.user.is_authenticated:
         user = request.user
         profilepic = UserDetail.objects.get(user=user)
-        return render(request, 'User/userProfile.html', {'username': user.username, 'profilepic': profilepic})
+        user_detail = UserDetail.objects.get(user=request.user)
+        return render(request, 'User/userProfile.html', {'username': user.username, 'profilepic': profilepic, 'user_detail':user_detail})
     else:
         return redirect(login)
 
@@ -201,7 +213,8 @@ def cart(request):
         for x in cart:
             get_total = x.get_total + get_total
         address = ShippingAddress.objects.filter(user=user)
-        return render(request, 'User/cart.html', {'cart_data': cart, 'total_amount': get_total, 'address': address})
+        user_detail = UserDetail.objects.get(user=user)
+        return render(request, 'User/cart.html', {'cart_data': cart, 'total_amount': get_total, 'address': address, 'user_detail':user_detail})
     else:
         return redirect(home)
 
@@ -247,11 +260,12 @@ def add_address(request):
     if request.user.is_authenticated:
         user = request.user
         if request.method == 'POST':
+            print("aaaaaaaaaaaaaaaaaddddddddddddddddddddd        aaaaaaaaaaaaaaddddddddddddrrrrrrrrrrrrreeeeeeeeeeeesssssssssssssssssss")
             address = request.POST['address']
             state = request.POST['state']
             city = request.POST['city']
 
-            if ShippingAddress.objects.filter(address=address).exists():
+            if ShippingAddress.objects.filter(user=user, address=address).exists():
                 return redirect(add_address)
             else:
                 address = ShippingAddress.objects.create(user=user, address=address, state=state, city=city)
@@ -296,14 +310,57 @@ def user_payment(request, id):
             get_total = 0
             for x in orderItem:
                 get_total = x.get_total + get_total
-
+            user_detail = UserDetail.objects.get(user=request.user) 
             return render(request, 'User/payment.html',
-                          {'address': address, 'items': orderItem, 'total_price': get_total})
+                          {'address': address, 'items': orderItem, 'total_price': get_total, 'user_detail':user_detail})
     else:
         user = request.user
         cart = OrderItem.objects.filter(user=user)
         return render(request, 'User/checkout.html')
 
+
+def success_razorpay(request):
+    if request.user.is_authenticated:
+        date = datetime.datetime.now()
+        user = request.user
+        mode = 'Razorpay'
+        id = request.POST['id']
+        tid = request.POST['tid']
+        address = ShippingAddress.objects.get(id=id)
+        cart = OrderItem.objects.filter(user=user)
+        get_total = 0
+        for x in cart:
+            get_total = x.get_total + get_total
+        for item in cart:
+            Order.objects.create(user=user, address=address, product=item.product, total_price=get_total, transaction_id=tid, 
+            date_ordered=date, payment_status='SUCCESS', payment_mode=mode, quantity=item.quantity, order_status='Placed')
+
+        cart.delete()
+        return JsonResponse('success', safe=False)
+
+
+def success_paypal(request):
+    print("gassallai asd honey ")
+    if request.user.is_authenticated:
+        date = datetime.datetime.now()
+        user = request.user
+        mode = 'Paypal'
+        id = request.POST['id']
+        tid = request.POST['tid']
+        address = ShippingAddress.objects.get(id=id)
+        cart = OrderItem.objects.filter(user=user)
+        get_total = 0
+        for x in cart:
+            get_total = x.get_total + get_total
+        for item in cart:
+            Order.objects.create(user=user, address=address, product=item.product,
+                                 total_price=get_total,
+                                 transaction_id=tid, date_ordered=date, payment_status='SUCCESS',
+                                 payment_mode=mode, quantity=0, order_status='Placed')
+        cart.delete()
+        return JsonResponse('success', safe=False)
+    else:
+        return redirect(login)
 
 
 def view_order(request):
@@ -317,12 +374,17 @@ def view_order(request):
                 order_dict[x.transaction_id].order_price = order_dict[x.transaction_id].total_price
             else:
                 order_dict[x.transaction_id].order_price += order_dict[x.transaction_id].total_price
-
-        return render(request, 'User/order.html', {'item_data': order_dict}, )
+        user_detail = UserDetail.objects.get(user=request.user)
+        return render(request, 'User/order.html', {'item_data': order_dict, 'user_detail':user_detail})
     return redirect(login)
 
 def order_items(request):
     if request.user.is_authenticated:
         user = request.user
         order = Order.objects.filter(user=user)
-        return render(request, 'User/orderItems.html', {'orders': order})
+        user_detail = UserDetail.objects.get(user=request.user)
+        return render(request, 'User/orderItems.html', {'orders': order, 'user_detail':user_detail})
+
+
+def cancel_order_user(request, id):
+    pass
