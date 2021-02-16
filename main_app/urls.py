@@ -23,6 +23,11 @@ urlpatterns = [
     path('update-category/<int:id>', views.update_category, name="update_category"),
     path('edit-category/<int:id>', views.edit_category, name="edit_category"),
 
+    path('manage-coupon', views.manage_coupon, name="manage_coupon"),
+    path('add-coupon', views.add_coupon, name="add_coupon"),
+    path('delete-coupon/<int:id>', views.delete_coupon, name="delete_coupon"),
+    path('edit-coupon/<int:id>', views.edit_coupon, name="edit_coupon"),
+
     path('manage-refferal/', views.manage_refferal, name="manage_refferal"),
     path('add-refferal/', views.add_refferal, name="add_refferal"),
     path('edit-refferal/<int:id>/', views.edit_refferal, name="edit_refferal"),

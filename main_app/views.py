@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.models import User, auth
 from django.http import HttpResponse
 from . models import *
-from app1.models import Order, OrderItem
+from app1.models import Order, OrderItem, Coupon
 from django.contrib import messages
 from django.core.files.base import ContentFile
 import base64
@@ -157,6 +157,57 @@ def block_user(request, user_id):
     else:
         return redirect('/admin-login')
 
+
+def manage_coupon(request):
+    if request.session.has_key('password'):
+        coupon = Coupon.objects.all()
+        return render(request, 'AdminPanel/manage_coupon.html', {'coupon': coupon})
+    else:
+        return redirect(admin_login)
+
+
+def add_coupon(request):
+    if request.session.has_key('password'):
+        if request.method == 'POST':
+            name = request.POST.get('name')
+            validity_start = request.POST.get('validity_start')
+            validity_end = request.POST.get('validity_end')
+            discount = request.POST.get('discount')
+
+            Coupon.objects.create(name=name, status=True, validity_start=validity_start, 
+                            validity_end=validity_end, discount=discount)
+            return redirect(manage_coupon)
+        else:
+            return render(request, 'AdminPanel/add_coupon.html')
+    else:
+        return redirect(admin_login)
+
+
+def edit_coupon(request, id):
+    if request.session.has_key('password'):
+        coupon = Coupon.objects.get(id=id)
+        if request.method == 'POST':
+            coupon.name = request.POST.get('name')
+            coupon.status = request.POST.get('status')
+            coupon.validity_start = request.POST.get('validity_start')
+            coupon.validity_end = request.POST.get('validity_end')
+            coupon.discount = request.POST.get('discount')
+
+            coupon.save()
+            return redirect(manage_coupon)
+        else:
+            return render(request, 'AdminPanel/edit_coupon.html', {'coupon': coupon})
+    else:
+        return redirect(admin_login)
+
+
+def delete_coupon(request, id):
+    if request.session.has_key('password'):
+        coupon = Coupon.objects.get(id=id)
+        coupon.delete()
+        return redirect(manage_coupon)
+    else:
+        return redirect(admin_login)
 
 def manage_refferal(request):
     if request.session.has_key('password'):

@@ -1,7 +1,7 @@
  {% extends 'User/base.html' %}
 
 {% block title %}
-Cart
+Order
 {% endblock %}
 
 {% block content %}
@@ -9,7 +9,8 @@ Cart
 <div class="container p-5">
     <div class="row">
 		<div class="col-md-8">
-		<div class="box-body" style="padding-bottom: 20em; overflow-x:auto;">
+		<div class="box-body" style="overflow-x:auto;">
+			<h5>Orders Items</h5>
 			<table width="100%" class="table table-hover table-responsive  table-bordered" id="dataTables-example">
 				<thead class="thead-dark">
 					<tr>
@@ -41,7 +42,7 @@ Cart
 						<td style="color: black;">{{item.payment_mode}}</td>
 						<td style="color: black;">{{item.payment_status}}</td>
 						<td style="color: black;">{{item.order_status}}</td>
-						<td style="color: black;"><a href="{% url 'cancel_order_user' item.transaction_id %}">Cancel Order</a></td>
+						<td style="color: black; text-align: center;"><a href="{% url 'cancel_order_user' item.transaction_id %}">Cancel</a></td>
 					</tr>
 				{% endfor %}
 				</tbody>
@@ -49,8 +50,48 @@ Cart
 		</div>
 	</div>
 	<div class="col-md-4">
-		
+		<div class="card text-white bg-dark mb-3" style="max-width: 18rem;">
+			<div class="card-header">Cancelled Orders</div>
+			<div class="card-body">
+			  		<h7 class="card-title"></h7>
+			  <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+			</div>
+		  </div>
 	</div>
+	</div>
+
+	<div class="row">
+		<div class="col-md-8">
+			<div class="box-body" style="overflow-x:auto;">
+				<h5>Cancelled Orders</h5>
+				<table width="100%" class="table table-hover table-responsive  table-bordered" id="dataTables-example">
+					<thead class="thead-dark">
+						<tr>
+							<th style="text-align: center;">Sl.no</th>
+							<th style="text-align: center;">Order ON</th>
+							<th style="text-align: center;">Transaction ID</th>
+							<th style="text-align: center;">Address</th>
+							<th style="text-align: center;">Price</th>
+							<th style="text-align: center;">Payment Mode</th>
+							<th style="text-align: center;">Order Status</th>
+						</tr>
+					</thead>
+					<tbody>
+					{% for tid, item in cancel_order.items %}
+						<tr>
+							<td style="color: black;">{{forloop.counter}}</td>
+							<td style="color: black;">{{item.date_ordered}}</td>
+							<td style="color: black;">{{item.transaction_id}}</td>
+							<td style="color: black;">{{item.address.address}},{{item.address.city}},{{item.address.state}}</td>
+							<td style="color: black;">{{item.total_price}}</td>
+							<td style="color: black;">{{item.payment_mode}}</td>
+							<td style="color: black;">{{item.order_status}}</td>
+						</tr>
+					{% endfor %}
+					</tbody>
+				</table>
+			</div>
+		</div>
 	</div>
 </div>
  {% endblock %}

@@ -3,12 +3,13 @@ from main_app.models import ProductDetail, Category, UserDetail
 from django.contrib.auth.models import User, auth
 from django.contrib import messages
 from django.contrib.auth.hashers import check_password
-from .models import OrderItem, Order, ShippingAddress
+from .models import OrderItem, Order, ShippingAddress, CancelledOrder
 from django.http import JsonResponse
 import uuid
 import datetime
 import base64
 from django.core.files.base import ContentFile
+import requests
 
 
 # Create your views here.
@@ -214,7 +215,11 @@ def cart(request):
             get_total = x.get_total + get_total
         address = ShippingAddress.objects.filter(user=user)
         user_detail = UserDetail.objects.get(user=user)
-        return render(request, 'User/cart.html', {'cart_data': cart, 'total_amount': get_total, 'address': address, 'user_detail':user_detail})
+
+        context = {
+            'cart_data': cart, 'total_amount': get_total, 'address': address, 'user_detail':user_detail
+        }
+        return render(request, 'User/cart.html', context)
     else:
         return redirect(home)
 
@@ -260,7 +265,6 @@ def add_address(request):
     if request.user.is_authenticated:
         user = request.user
         if request.method == 'POST':
-            print("aaaaaaaaaaaaaaaaaddddddddddddddddddddd        aaaaaaaaaaaaaaddddddddddddrrrrrrrrrrrrreeeeeeeeeeeesssssssssssssssssss")
             address = request.POST['address']
             state = request.POST['state']
             city = request.POST['city']
@@ -275,6 +279,18 @@ def add_address(request):
             return redirect(cart)
     else:
         return redirect(home)
+
+
+def apply_coupon(request):
+    if request.user.is_authenticated:
+        if request.method == 'POST':
+            user = request.user
+            name = request.POST['coupon_code']
+            print(name)
+    else:
+        return redirect(login)
+
+        
 
 
 def user_payment(request, id):
@@ -374,9 +390,25 @@ def view_order(request):
                 order_dict[x.transaction_id].order_price = order_dict[x.transaction_id].total_price
             else:
                 order_dict[x.transaction_id].order_price += order_dict[x.transaction_id].total_price
+        print(order_dict)
         user_detail = UserDetail.objects.get(user=request.user)
-        return render(request, 'User/order.html', {'item_data': order_dict, 'user_detail':user_detail})
+
+        cancel_order = CancelledOrder.objects.filter(user=user)
+        cancel_order_dict = {}
+        for x in cancel_order:
+            if not x.transaction_id in cancel_order_dict.keys():
+                cancel_order_dict[x.transaction_id] = x
+                cancel_order_dict[x.transaction_id].order_price = cancel_order_dict[x.transaction_id].total_price
+            else:
+                cancel_order_dict[x.transaction_id].order_price += cancel_order_dict[x.transaction_id].total_price
+
+
+        context = {
+            'item_data': order_dict, 'user_detail':user_detail, 'cancel_order': cancel_order_dict
+        }
+        return render(request, 'User/order.html', context)
     return redirect(login)
+
 
 def order_items(request):
     if request.user.is_authenticated:
@@ -384,7 +416,23 @@ def order_items(request):
         order = Order.objects.filter(user=user)
         user_detail = UserDetail.objects.get(user=request.user)
         return render(request, 'User/orderItems.html', {'orders': order, 'user_detail':user_detail})
+    else:
+        redirect(login)
 
 
 def cancel_order_user(request, id):
-    pass
+    if request.user.is_authenticated:
+        order = Order.objects.filter(transaction_id=id)
+
+        for x in order:
+            total_price = x.total_price
+            CancelledOrder.objects.create(user=request.user, address=x.address, product=x.product,
+                                 total_price=x.total_price,
+                                 transaction_id=x.transaction_id, date_ordered=x.date_ordered, payment_status=x.payment_status,
+                                 payment_mode=x.payment_mode, quantity=0, order_status='Cancelled')
+        
+        user = UserDetail.objects.get(user=request.user)
+        user.wallet += total_price
+        user.save()
+        order.delete()
+        return redirect(view_order)

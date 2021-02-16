@@ -39,6 +39,14 @@ class OrderItem(models.Model):
         return total
 
 
+class Coupon(models.Model):
+    name = models.CharField(max_length=225, null=True, blank=True)
+    status = models.BooleanField(null=True, default=True)
+    discount = models.IntegerField(null=True)
+    validity_start = models.DateField(null=True, blank=True)
+    validity_end = models.DateField(null=True, blank=True)
+
+
 class CancelledOrder(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     product = models.ForeignKey(ProductDetail, on_delete=models.CASCADE, null=True, blank=True)
