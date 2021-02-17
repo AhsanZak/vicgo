@@ -1,0 +1,111 @@
+{% extends 'User/base.html' %}
+{% load static %}
+
+{% block title %}
+OTP Login
+{% endblock %}
+
+{% block content %}
+
+{% if otp == 1 %}
+	<div>
+		<div>
+			<div>
+				<div>
+					<button type="button" class="close" data-dismiss="modal">&times;</button>
+				</div>
+                <div class="container">
+                    <div class="row">
+                        <div class="col-md-3">
+
+                        </div>
+                        <div class="col-md-6">
+                            <div class="modal-body modal-body-sub_agile">
+                                <div class="main-mailposi">
+                                    <span class="fa fa-envelope-o" aria-hidden="true"></span>
+                                </div>
+                                <div class="modal_body_left modal_body_left1">
+                                    <h3 class="agileinfo_sign">Log In </h3>
+                                    <p>
+                                        Log In now, with your registered Mobile number. Don't have an account?
+                                        <a href="{% url 'signup' %}" >
+                                            Sign Up Now</a>
+                                    </p>
+                                    {% for message in messages %}
+                                        <div class="message">
+                                            <h4>{{message}}</h4>
+                                        </div>
+                                    {% endfor %}
+                                    <form action="#" method="post">
+                                        {% csrf_token %}
+                                        <div class="styled-input agile-styled-input-top">
+                                            <input type="text" placeholder="Registered Mobile Number" name="mobile" required="">
+                                        </div>
+                                        <input type="submit" value="Get OTP ">
+                                    </form>
+                                    <div class="clearfix"></div>
+                                </div>
+                                <div class="clearfix"></div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            
+                        </div>
+                    </div>
+                </div>
+				
+			</div>
+		</div>
+	</div>
+
+{% elif otp == 0 %}
+	<div>
+		<div>
+			<div>
+				<div>
+					<button type="button" class="close" data-dismiss="modal">&times;</button>
+				</div>
+
+                <div class="container">
+                    <div class="row">
+                        <div class="col-md-3"></div>
+                        <div class="col-md-6">
+                            <div class="modal-body modal-body-sub_agile">
+                                <div class="main-mailposi">
+                                    <span class="fa fa-envelope-o" aria-hidden="true"></span>
+                                </div>
+                                <div class="modal_body_left modal_body_left1">
+                                    <h3 class="agileinfo_sign">Log In </h3>
+                                    {% for message in messages %}
+                                        <div class="message">
+                                            <h4>{{message}}</h4>
+                                        </div>
+                                    {% endfor %}
+                                    <form action="{% url 'verify_otp' %}" method="post">
+                                        {% csrf_token %}
+                                        <div class="styled-input agile-styled-input-top">
+                                            <input type="text" placeholder="Enter OTP" name="otp" required="">
+                                        </div>
+                                        <input type="submit" value="Submit ">
+                                    </form>
+                                    <div class="clearfix"></div>
+                                </div>
+                                <div class="clearfix"></div>
+                            </div>
+            
+                        </div>
+                        <div class="col-md-3"></div>
+                    </div>
+                </div>
+
+			</div>
+		</div>
+	</div>
+
+{% endif %}
+
+
+
+{% endblock %}
+
+

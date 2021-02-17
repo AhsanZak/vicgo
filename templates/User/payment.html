@@ -47,11 +47,12 @@ Payment
             <div class="col-md-4 p-2">
                 <!------coupon-------->
                 <div class="container ">
+                    <span style="color: red; font-weight: bold;" id="coupenmsg" ></span><br>
                     <div class="card p-2" style="width: auto; background-color: #FF5722">
                         <form>
                             <label>Coupon Code</label><br>
-                            <input name="coupon_name" id="coupon_code" placeholder="Enter coupon code here">
-                            <button class="btn btn-primary" type="submit" id="coupon_Btn">Apply</button>
+                            <input type="text" id="coupen" name="coupen">
+                            <button id="coupen_btn" class="btn btn-primary" type="button">Apply</button>
                         </form>
                     </div>
                 </div>
@@ -260,19 +261,34 @@ Payment
 </script>
 
 <script>
-    var couponcode = $("#coupon_code").val()
-    $('#coupon_Btn').click(function () {
-        var userData = {
-            csrfmiddlewaretoken: '{{ csrf_token }}',
-            coupon_code: couponcode
-        }
-        $.ajax({
-            url: '/apply-coupon/',
-            type: "POST",
-            data: userData,
-            dataType: "json",
 
-        })
+   $('#coupen_btn').click(function () {
+        let coupen = $('#coupen').val()
+        var coupenInfo = {
+            csrfmiddlewaretoken: '{{csrf_token}}',
+            coupenCode: coupen
+        }
+        if (coupen == '') {
+            $('#coupenmsg').html('Enter An Coupon Code')
+        }
+        else {
+            $.ajax({
+                url: '/apply-coupon/',
+                type: 'POST',
+                data: coupenInfo,
+                dataType: 'JSON',
+                success: function (data) {
+                    if (data == 'validcoupen'){
+                        $('#coupenmsg').html('Coupen is valid')
+                    }
+                    else if(data == 'notvalidcoupen'){
+                        $('#coupenmsg').html('Coupen is not valid')
+                    }
+                }
+            })
+
+        }
+
     })
 
 </script>

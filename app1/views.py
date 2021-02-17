@@ -3,13 +3,15 @@ from main_app.models import ProductDetail, Category, UserDetail
 from django.contrib.auth.models import User, auth
 from django.contrib import messages
 from django.contrib.auth.hashers import check_password
-from .models import OrderItem, Order, ShippingAddress, CancelledOrder
+from .models import OrderItem, Order, ShippingAddress, CancelledOrder, Coupon, ProductImages
 from django.http import JsonResponse
 import uuid
 import datetime
 import base64
 from django.core.files.base import ContentFile
 import requests
+import json
+
 
 
 # Create your views here.
@@ -40,7 +42,12 @@ def single(request, product_id):
     product = ProductDetail.objects.get(id=product_id)
     category_product = ProductDetail.objects.filter(product_category=product.product_category)
     user_detail = UserDetail.objects.get(user=request.user)
-    return render(request, 'User/single.html', {'product': product, 'category_product': category_product, 'user_detail':user_detail})
+    product_images = ProductImages.objects.filter(product=product)
+    context = {
+        'product': product, 'category_product': category_product, 'user_detail':user_detail, 
+        'product_images': product_images
+    }
+    return render(request, 'User/single.html', context)
 
 
 def login(request):
@@ -252,7 +259,84 @@ def cart_update(request, id):
 
 
 def otp_login(request):
-    pass
+    if request.user.is_authenticated:
+        return redirect(home)
+    otp = 1
+    if request.method == 'POST':
+        number = request.POST['mobile']
+        request.session['number'] = number
+        if UserDetail.objects.filter(mobile_no=number).exists():
+            otp = 0
+            url = "https://d7networks.com/api/verifier/send"
+            number = str(91) + number
+            payload = {
+                'mobile': number,
+                'sender_id': 'SMSINFO',
+                'message': 'Your otp code is {code}',
+                'expiry': '900'}
+            files = [
+            ]
+            headers = {
+                'Authorization': 'Token b76a52adeb253e2dbb98dd2378d542f8d53fbe6b'
+            }
+            response = requests.request("POST", url, headers=headers, data=payload, files=files)
+            data = response.text.encode('utf8')
+            datadict = json.loads(data)
+            id = datadict['otp_id']
+            request.session['id'] = id
+
+            return render(request, 'User/otplogin.html', {'otp': otp})
+        else:
+            messages.info(request, "Please enter registered Number")
+            return render(request, 'User/otplogin.html', {'otp': otp})
+    else:
+        return render(request, 'User/otplogin.html', {'otp': otp})
+
+
+def verify_otp(request):
+    if request.user.is_authenticated:
+        return redirect(home)
+    else:
+        if request.method == 'POST':
+            otp = request.POST['otp']
+            id_otp = request.session['id']
+            url = "https://d7networks.com/api/verifier/verify"
+            payload = {'otp_id': id_otp,
+                       'otp_code': otp}
+            files = [
+
+            ]
+            headers = {
+                'Authorization': 'Token b76a52adeb253e2dbb98dd2378d542f8d53fbe6b'
+            }
+
+            response = requests.request("POST", url, headers=headers, data=payload, files=files)
+            data = response.text.encode('utf8')
+            datadict = json.loads(data)
+            status = datadict['status']
+
+            if status == 'success':
+                number = request.session['number']
+                user_detail = UserDetail.objects.filter(mobile_no=number).first()
+                user = user_detail.user
+                print(user)
+                if user_detail is not None:
+                    if user_detail.user.is_active == False:
+                        messages.info(request, 'User is blocked')
+                        return redirect(login)
+
+                    else:
+                        auth.login(request, user)
+                        return redirect(home)
+                else:
+                    return redirect(login)
+
+            else:
+                messages.error(request, 'User not Exist')
+                return redirect(login)
+
+        else:
+            return HttpResponse("Oops")
 
 
 def user_remove_order_item(request, id):
@@ -285,8 +369,16 @@ def apply_coupon(request):
     if request.user.is_authenticated:
         if request.method == 'POST':
             user = request.user
-            name = request.POST['coupon_code']
-            print(name)
+            name = request.POST['coupenCode']
+            if Coupon.objects.filter(name=name).exists():
+                coupon = Coupon.objects.get(name=name)
+                discount = coupon.discount
+                coupon_session = request.session['coupon'] = discount
+                return JsonResponse('validcoupen', safe=False)
+            else:
+                return JsonResponse('notvalidcoupen', safe=False)
+
+            
     else:
         return redirect(login)
 
@@ -309,26 +401,52 @@ def user_payment(request, id):
                 address = ShippingAddress.objects.get(id=id)
                 cart = OrderItem.objects.filter(user=user)
                 get_total = 0
-                for x in cart:
-                    get_total = x.get_total + get_total
-                for item in cart:
-                    Order.objects.create(user=user, address=address, product=item.product,
-                                         total_price=get_total,
-                                         transaction_id=transaction_id, date_ordered=date, payment_status='Pending',
-                                         payment_mode=mode, quantity=0, order_status='Placed')
-                cart.delete()
-                return JsonResponse({'mode': mode, 'tid': transaction_id}, safe=False)
+
+                if request.session.has_key('coupon'):
+                    discount = request.session['coupon']
+                    for x in cart:
+                        get_total = x.get_total + get_total
+                    get_total = get_total - (get_total*discount)/100
+                    for item in cart:
+                        Order.objects.create(user=user, address=address, product=item.product,
+                                            total_price=get_total,
+                                            transaction_id=transaction_id, date_ordered=date, payment_status='Pending',
+                                            payment_mode=mode, quantity=0, order_status='Placed')
+                    cart.delete()
+                    del request.session['coupon']
+                    return JsonResponse({'mode': mode, 'tid': transaction_id}, safe=False)
+                else:
+                    for x in cart:
+                        get_total = x.get_total + get_total
+                    for item in cart:
+                        Order.objects.create(user=user, address=address, product=item.product,
+                                            total_price=get_total,
+                                            transaction_id=transaction_id, date_ordered=date, payment_status='Pending',
+                                            payment_mode=mode, quantity=0, order_status='Placed')
+                    cart.delete()
+                    return JsonResponse({'mode': mode, 'tid': transaction_id}, safe=False)
         else:
             user = request.user
             address = ShippingAddress.objects.get(id=id)
             orderItem = OrderItem.objects.filter(user=user)
-
             get_total = 0
-            for x in orderItem:
-                get_total = x.get_total + get_total
-            user_detail = UserDetail.objects.get(user=request.user) 
-            return render(request, 'User/payment.html',
-                          {'address': address, 'items': orderItem, 'total_price': get_total, 'user_detail':user_detail})
+
+            if request.session.has_key('coupon'):
+                discount = request.session['coupon']
+                for x in orderItem:
+                    get_total = x.get_total + get_total
+
+                get_total = get_total - (get_total*discount)/100
+                user_detail = UserDetail.objects.get(user=request.user) 
+                return render(request, 'User/payment.html',
+                            {'address': address, 'items': orderItem, 'total_price': get_total, 'user_detail':user_detail})
+
+            else:
+                for x in orderItem:
+                    get_total = x.get_total + get_total
+                user_detail = UserDetail.objects.get(user=request.user) 
+                return render(request, 'User/payment.html',
+                            {'address': address, 'items': orderItem, 'total_price': get_total, 'user_detail':user_detail})
     else:
         user = request.user
         cart = OrderItem.objects.filter(user=user)

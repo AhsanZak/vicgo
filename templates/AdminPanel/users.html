@@ -84,7 +84,6 @@
                                         <th>Username</th>
                                         <th>Name</th>
                                         <th>Email</th>
-                                        <th>Mobile No.</th>
                                         <th>Block/Unblock</th>
                                         <th></th>
 
@@ -97,7 +96,6 @@
                                         <td>{{x.username}}</td>
                                         <td>{{x.first_name}}</td>
                                         <td>{{x.email}}</td>
-                                        <td>{{x.last_name}}</td>
                                         <td>
                                             {% if x.is_active == False %}
                                             <a href="{% url 'block_user' x.id %}" class="btn btn-outline-success btn-rounded"><i class="fas fa-ban"></i></a>

@@ -6,6 +6,8 @@ from app1.models import Order, OrderItem, Coupon
 from django.contrib import messages
 from django.core.files.base import ContentFile
 import base64
+from django.core.files.storage import FileSystemStorage
+
 # Create your views here.
 
 
@@ -327,6 +329,7 @@ def create_product(request):
             product_description = request.POST['product_description']
             product_price = request.POST['product_price']
             image_data = request.POST['pro_img']
+            extra_images = request.FILES.getlist('file[]')
 
             format, imgstr = image_data.split(';base64,')
             ext = format.split('/')[-1]
@@ -336,6 +339,14 @@ def create_product(request):
                                                    product_description=product_description, product_price=product_price,
                                                    product_image=data)
             product.save()
+
+            for img in extra_images:
+                fs=FileSystemStorage()
+                file_path=fs.save(img.name,img)
+                fileurl = fs.url(file_path)
+                pimage=ProductImages.objects.create(product=product,extra_images=file_path)
+                pimage.save()
+
             return redirect('/manage-product')
         else:
             category = Category.objects.all()
@@ -402,7 +413,7 @@ def manage_order(request):
 
 def cancel_order(request, tid):
     if request.session.has_key('password'):
-        object = Order.objects.get(transaction_id=tid)
+        object = Order.objects.filter(transaction_id=tid).first()
         if object.order_status == 'Placed':
             object.order_status = 'Pending'
             object.save()

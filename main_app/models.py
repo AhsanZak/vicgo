@@ -47,6 +47,20 @@ class ProductDetail(models.Model):
         return url
 
 
+class ProductImages(models.Model):
+    product = models.ForeignKey(ProductDetail, on_delete=models.CASCADE, null=True)
+    extra_images = models.ImageField(null=True, blank=True)
+
+    @property
+    def ImageURL(self):
+        try:
+            url = self.extra_images.url
+        except ValueError:
+            url = ''
+        return url
+
+
+
 class RefferalOffer(models.Model):
     reff_name = models.CharField(null=True, max_length=225)
     reff_discount = models.IntegerField(null=True)
