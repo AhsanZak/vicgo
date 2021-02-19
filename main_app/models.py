@@ -18,26 +18,6 @@ class UserDetail(models.Model):
         return url
 
 
-class offer(models.Model):
-    category = models.ForeignKey(Category,on_delete=models.CASCADE,null=True)
-    Product = models.ForeignKey(Product,on_delete=models.CASCADE,null=True)
-    offer_name = models.CharField(max_length=20,null=True,blank=True)
-    offer_image = models.FileField(max_length=255,null=True,blank=True,upload_to='offers/offer_images')
-    offer_start = models.DateField(null=True)
-    offer_expiry = models.DateField(null=True)
-    discount_amount = models.FloatField(null=True)
-    offer_type = models.CharField(null=True,blank=True,max_length=40)
-
-    @property
-    def ImageURL(self):
-        try:
-            url = self.offer_image.url
-        except:
-            url = ''
-        return url
-
-        
-
 class Category(models.Model):
     category_name = models.CharField(max_length=50, null=True)
     category_image = models.ImageField(null=True, blank=True)
@@ -57,6 +37,8 @@ class ProductDetail(models.Model):
     product_price = models.IntegerField(null=True)
     product_category = models.ForeignKey(Category, on_delete=models.CASCADE, null=True)
     product_image = models.ImageField(null=True, blank=True)
+    offer_price = models.FloatField(null=True,blank=True)
+    offer_percentage = models.IntegerField(null=True,blank=True)
 
     @property
     def ImageURL(self):
@@ -78,6 +60,16 @@ class ProductImages(models.Model):
         except ValueError:
             url = ''
         return url
+
+
+class offer(models.Model):
+    category = models.ForeignKey(Category,on_delete=models.CASCADE,null=True)
+    product = models.ForeignKey(ProductDetail,on_delete=models.CASCADE,null=True)
+    offer_name = models.CharField(max_length=20,null=True,blank=True)
+    offer_start = models.DateField(null=True)
+    offer_expiry = models.DateField(null=True)
+    discount_amount = models.FloatField(null=True)
+    offer_type = models.CharField(null=True,blank=True,max_length=40)
 
 
 
