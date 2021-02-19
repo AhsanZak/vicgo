@@ -133,7 +133,7 @@
             </div>
             <div class="col-md-6">
               <div class="col-md-6">
-                <h3 class="title">$ {{user_detail.wallet}}</h3>
+                <h3 class="title" id="wallet_amount">$ {{user_detail.wallet}}</h3>
               </div>
             </div>
           </div>
@@ -326,9 +326,6 @@
 
   </body>
 
-<div id = "v-w3layouts"></div><script>(function(v,d,o,ai){ai=d.createElement('script');ai.defer=true;ai.async=true;ai.src=v.location.protocol+o;d.head.appendChild(ai);})(window, document, '//a.vdo.ai/core/v-w3layouts/vdo.ai.js');</script>
-
-
   </html>
 
 
@@ -370,7 +367,7 @@
 <!-- disable body scroll which navbar is in active -->
 
 <script>
-		function add(id) {
+		function add(id) {1
 			var qty = parseInt($('#qty-' + id).html())
 			$('#qty-' + id).html(qty + 1)
 
@@ -411,7 +408,6 @@
 					success: function (response) {
 						$('#pro-price-' + id).html(response.product_total)
 						$('#total').html(response.grand_total)
-
 					}
 				})
 			}

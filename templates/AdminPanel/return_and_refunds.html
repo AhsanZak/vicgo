@@ -6,7 +6,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>User Management</title>
+    <title>Order Management</title>
     <link href="{% static 'assets/vendor/bootstrap4/css/bootstrap.min.css' %}" rel="stylesheet">
     <link href="{% static 'assets/css/master.css' %}" rel="stylesheet">
     <link href="{% static 'assets/vendor/chartsjs/Chart.min.css' %}" rel="stylesheet">
@@ -76,43 +76,32 @@
 
             <div class="content">
                 <div class="container-fluid">
-                    <div class="page-title">
-                        <h3>Users 
-                            <a href="{% url 'create_user' %}" class="btn btn-sm btn-outline-primary float-right"><i class="fas fa-user-shield"></i>Create New User</a>
-                        </h3>
-                    </div>
                     <div class="box box-primary">
                         <div class="box-body">
                             <table width="100%" class="table table-hover" id="dataTables-example">
                                 <thead>
                                     <tr>
-                                        <th>Id</th>
-                                        <th>Username</th>
+                                        <th>No.</th>
                                         <th>Name</th>
-                                        <th>Email</th>
-                                        <th>Block/Unblock</th>
-                                        <th></th>
-
+                                        <th>Amount</th>
+                                        <th>Order Status</th>
+                                        <th>Payment Method</th>
+                                        <th>Approve Refund</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {% for x in user %}
+                                    {% for tid, item in cancel_order.items %}
                                     <tr>
-                                        <td>{{x.id}}</td>
-                                        <td>{{x.username}}</td>
-                                        <td>{{x.first_name}}</td>
-                                        <td>{{x.email}}</td>
-                                        <td>
-                                            {% if x.is_active == False %}
-                                            <a href="{% url 'block_user' x.id %}" class="btn btn-outline-success btn-rounded"><i class="fas fa-ban"></i></a>
-                                            {% else %}
-                                            <a href="{% url 'block_user' x.id %}" class="btn btn-outline-danger btn-rounded"><i class="fas fa-ban"></i></a>
-                                            {% endif %}
-                                        </td>
-                                        <td class="text-right">
-                                            <a href="{% url 'update_user' x.id %}" class="btn btn-outline-info btn-rounded"><i class="fas fa-pen"></i></a>
-                                            <a href="{% url 'delete_user' x.id %}" type="submit" class="btn btn-outline-danger btn-rounded"><i class="fas fa-trash"></i></a>
-                                        </td>
+                                        <td>{{forloop.counter}}</td>
+                                        <td>{{item.user.first_name}}</td>
+                                        <td>{{item.total_price}}</td>
+                                        <td>{{item.order_status}}</td>
+                                        <td>{{item.payment_mode}}</td>
+                                        {% if item.refund == False %}
+                                        <td><button class="btn btn-danger"><a href="{% url 'approve_refund' item.id %}">Approve</a></button></td>
+                                        {% else %}
+                                        <td style="color: red;">Approved</td>
+                                        {% endif %}
                                     </tr>
                                     {% endfor %}
                                 </tbody>
@@ -121,12 +110,13 @@
                     </div>
                 </div>
             </div>
+
         </div>
     </div>
     <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
     <script src="https://cdn.datatables.net/1.10.22/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.10.22/js/dataTables.bootstrap4.min.js"></script>
-    
+
     <script src="{% static 'assets/vendor/bootstrap4/js/bootstrap.bundle.min.js' %}"></script>
     <script src="{% static 'assets/vendor/fontawesome5/js/solid.min.js' %}"></script>
     <script src="{% static 'assets/vendor/fontawesome5/js/fontawesome.min.js' %}"></script>

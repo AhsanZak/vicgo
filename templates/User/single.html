@@ -22,13 +22,13 @@ Single
 
 						<ul class="slides">
 							<li data-thumb="{{product.ImageURL}}">
-								<div class="thumb-image"> <img src="{{product.ImageURL}}" data-imagezoom="true"
-										class="img-fluid" alt=" "> </div>
+								<div class="thumb-image"> <img src="{{product.ImageURL}}" style="height: 25em; width: 25em;" data-imagezoom="true"
+										class="img-fluid" alt=""> </div>
 							</li>
 							{% for x in product_images %}
 							<li data-thumb="{{x.ImageURL}}">
-								<div class="thumb-image"> <img src="{{x.ImageURL}}" data-imagezoom="true"
-										class="img-fluid" alt=" "> </div>
+								<div class="thumb-image"> <img src="{{x.ImageURL}}" style="height: 25em; width: 25em;" data-imagezoom="true"
+										class="img-fluid" alt=""> </div>
 							</li>
 							{% endfor %}
 						</ul>

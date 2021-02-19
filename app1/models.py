@@ -58,3 +58,4 @@ class CancelledOrder(models.Model):
     payment_mode = models.CharField(max_length=50, null=True)
     payment_status = models.CharField(max_length=50, null=True)
     quantity = models.IntegerField(null=True, blank=True)
+    refund = models.BooleanField(null=True, default=False)

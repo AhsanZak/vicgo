@@ -25,6 +25,7 @@ urlpatterns = [
     path('user-payment/<int:id>', views.user_payment, name="user_payment"),
     path('success-razorpay/', views.success_razorpay, name="success_razorpay"),
     path('success-paypal/', views.success_paypal, name="success_paypal"),
+    path('success-wallet/', views.success_wallet, name="success_wallet"),
 
 
     path('view-order/', views.view_order, name="view_order"),

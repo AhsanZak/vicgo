@@ -7,9 +7,6 @@
     <div class="wrapper">
 
         <nav id="sidebar" class="active">
-            <div class="sidebar-header">
-                <img src="" alt="bootraper logo" class="app-logo">
-            </div>
             <ul class="list-unstyled components text-secondary">
                 <li>
                     <a href="{% url 'dashboard' %}"><i class="fas fa-home"></i> Dashboard</a>
@@ -17,20 +14,26 @@
                 <li>
                     <a href="{% url 'manage_user' %}"><i class="fas fa-user-friends"></i>Users</a>
                 </li>
-                 <li>
+                <li>
                     <a href="{% url 'manage_product' %}"><i class="fas fa-user-friends"></i>Products</a>
                 </li>
-                 <li>
+                <li>
                     <a href="{% url 'manage_category' %}"><i class="fas fa-user-friends"></i>Category</a>
+                </li>
+                <li>
+                    <a href="{% url 'manage_order' %}"><i class="fas fa-user-friends"></i>Order</a>
                 </li>
                 <li>
                     <a href="{% url 'manage_coupon' %}"><i class="fas fa-user-friends"></i>Coupons</a>
                 </li>
-                 <li>
-                    <a href="{% url 'manage_order' %}"><i class="fas fa-user-friends"></i>Order</a>
+                <li>
+                    <a href="{% url 'manage_refferal' %}"><i class="fas fa-user-friends"></i>Referral Offer</a>
                 </li>
                 <li>
-                    <a href="{% url 'order_report' %}" ><i class="fas fa-user-shield"></i>Order Report</a>
+                        <a href="{% url 'order_report' %}" ><i class="fas fa-user-shield"></i>Order Report</a>
+                </li>
+                <li>
+                        <a href="{% url 'product_return' %}" ><i class="fas fa-user-shield"></i>Product Return and Refunds</a>
                 </li>
             </ul>
         </nav>

@@ -44,5 +44,8 @@ urlpatterns = [
     path('create_user/', views.create_user, name='create_user'),
     path('create_product/', views.create_product, name='create_product'),
 
+    path('product_return/', views.product_return, name="product_return"),
+    path('approve_refund/<int:id>', views.approve_refund, name="approve_refund")
+
 ]
 

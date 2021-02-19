@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.models import User, auth
 from django.http import HttpResponse
 from . models import *
-from app1.models import Order, OrderItem, Coupon
+from app1.models import Order, OrderItem, Coupon, CancelledOrder
 from django.contrib import messages
 from django.core.files.base import ContentFile
 import base64
@@ -211,6 +211,7 @@ def delete_coupon(request, id):
     else:
         return redirect(admin_login)
 
+
 def manage_refferal(request):
     if request.session.has_key('password'):
         refferal = RefferalOffer.objects.all()
@@ -413,13 +414,13 @@ def manage_order(request):
 
 def cancel_order(request, tid):
     if request.session.has_key('password'):
-        object = Order.objects.filter(transaction_id=tid).first()
-        if object.order_status == 'Placed':
-            object.order_status = 'Pending'
-            object.save()
-        else:
-            object.complete = 'Placed'
-            object.save()
+        object = Order.objects.filter(transaction_id=tid)
+        for x in object:
+            # if x.order_status == 'Cancelled':
+            #     x.order_status = 'Placed'
+            if x.order_status == 'Placed':
+                x.order_status = 'Cancelled'
+        x.save()
         return redirect(manage_order)
     else:
         return redirect(admin_login)
@@ -509,8 +510,13 @@ def placed_order(request):
             placed = Order.objects.filter(order_status='Placed').count()
             return render(request, 'AdminPanel/placed_orders.html', {'table_data': order_dict, 'placed': placed})
         else:
+            placed = Order.objects.all()
+            order_dict = {}
+            for x in placed:
+                if not x.transaction_id in order_dict.keys():
+                    order_dict[x.transaction_id] = x
             placed = Order.objects.filter(order_status='Placed').count()
-            return render(request, 'AdminPanel/placed_orders.html', {'placed': placed})
+            return render(request, 'AdminPanel/placed_orders.html', {'table_data': order_dict, 'placed': placed})
     else:
         return redirect(admin_login)
 
@@ -520,15 +526,52 @@ def cancelled_order(request):
         if request.method == 'POST':
             start_date = request.POST['start_date']
             end_date = request.POST['end_date']
-            cancelled = Order.objects.filter(date_ordered__range=[start_date, end_date], order_status='Cancelled')
+            cancelled = CancelledOrder.objects.filter(date_ordered__range=[start_date, end_date], order_status='Cancelled')
             order_dict = {}
             for x in cancelled:
                 if not x.transaction_id in order_dict.keys():
                     order_dict[x.transaction_id] = x
-            cancelled = Order.objects.filter(order_status='Cancelled').count()
+            cancelled = CancelledOrder.objects.filter(order_status='Cancelled').count()
             return render(request, 'AdminPanel/cancelled_orders.html', {'table_data': order_dict, 'cancelled': cancelled})
         else:
-            cancelled = Order.objects.filter(order_status='Cancelled').count()
-            return render(request, 'AdminPanel/cancelled_orders.html', {'cancelled': cancelled})
+            cancelled = CancelledOrder.objects.all()
+            order_dict = {}
+            for x in cancelled:
+                if not x.transaction_id in order_dict.keys():
+                    order_dict[x.transaction_id] = x
+            cancelled = CancelledOrder.objects.filter(order_status='Cancelled').count()
+            return render(request, 'AdminPanel/cancelled_orders.html', {'table_data': order_dict, 'cancelled': cancelled})
+    else:
+        return redirect(admin_login)
+
+
+def product_return(request):
+    if request.session.has_key('password'):
+        cancel_order = CancelledOrder.objects.all()
+        cancel_order_dict = {}
+        for x in cancel_order:
+            if not x.transaction_id in cancel_order_dict.keys():
+                cancel_order_dict[x.transaction_id] = x
+                cancel_order_dict[x.transaction_id].order_price = cancel_order_dict[x.transaction_id].total_price
+            else:
+                cancel_order_dict[x.transaction_id].order_price += cancel_order_dict[x.transaction_id].total_price
+
+        return render(request, 'AdminPanel/return_and_refunds.html', {'cancel_order': cancel_order_dict})
+    else:
+        return redirect(admin_login)
+
+
+def approve_refund(request, id):
+    if request.session.has_key('password'):
+        cancel_order = CancelledOrder.objects.filter(id=id)
+        for x in cancel_order:
+            total_price = x.total_price
+            user = x.user
+            x.refund = True
+            x.save()
+        user = UserDetail.objects.get(user=user)
+        user.wallet += total_price
+        user.save()
+        return redirect(product_return)
     else:
         return redirect(admin_login)

@@ -54,7 +54,7 @@ Order
 			<div class="card-header">Cancelled Orders</div>
 			<div class="card-body">
 			  		<h7 class="card-title"></h7>
-			  <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+			  <p class="card-text">The amount will be returned into the Customers Vicgo Wallet, when the Admin approves the cancel.</p>
 			</div>
 		  </div>
 	</div>
@@ -68,24 +68,26 @@ Order
 					<thead class="thead-dark">
 						<tr>
 							<th style="text-align: center;">Sl.no</th>
-							<th style="text-align: center;">Order ON</th>
 							<th style="text-align: center;">Transaction ID</th>
-							<th style="text-align: center;">Address</th>
 							<th style="text-align: center;">Price</th>
 							<th style="text-align: center;">Payment Mode</th>
+							<th style="text-align: center;">Refund</th>
 							<th style="text-align: center;">Order Status</th>
 						</tr>
 					</thead>
 					<tbody>
 					{% for tid, item in cancel_order.items %}
 						<tr>
-							<td style="color: black;">{{forloop.counter}}</td>
-							<td style="color: black;">{{item.date_ordered}}</td>
-							<td style="color: black;">{{item.transaction_id}}</td>
-							<td style="color: black;">{{item.address.address}},{{item.address.city}},{{item.address.state}}</td>
-							<td style="color: black;">{{item.total_price}}</td>
-							<td style="color: black;">{{item.payment_mode}}</td>
-							<td style="color: black;">{{item.order_status}}</td>
+							<td style="color: black; text-align: center;">{{forloop.counter}}</td>
+							<td style="color: black; text-align: center;">{{item.transaction_id}}</td>
+							<td style="color: black; text-align: center;">{{item.total_price}}</td>
+							<td style="color: black; text-align: center;">{{item.payment_mode}}</td>
+							{% if item.refund == True %}
+							<td style="color: green; font-weight: bold; text-align: center;">Refunded</td>
+							{% else %}
+							<td style="color: red; font-weight: bold; text-align: center;">Pending</td>
+							{% endif %}
+							<td style="color: black; text-align: center;">{{item.order_status}}</td>
 						</tr>
 					{% endfor %}
 					</tbody>

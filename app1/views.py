@@ -20,7 +20,7 @@ def home(request):
     products = ProductDetail.objects.all()
     category = Category.objects.all()
     if request.user.is_authenticated:
-        user_detail = UserDetail.objects.get(user=request.user)
+        user_detail = UserDetail.objects.filter(user=request.user)
         return render(request, 'User/index.html', {'products': products, 'category': category, 'user': request.user, 'user_detail':user_detail})
     else:
         return render(request, 'User/index.html', {'products': products, 'category': category})
@@ -60,7 +60,7 @@ def login(request):
             if user.is_active == False:
                 messages.info(request, 'User is Blocked')
             else:
-                auth.login(request, user)
+                auth.login(request, user, backend='django.contrib.auth.backends.ModelBackend')
                 return redirect(home)
         else:
             messages.info(request, "Invalid Credentials")
@@ -154,7 +154,6 @@ def reffral_signup(request, reff_code):
 
 def logout(request):
     if request.user.is_authenticated:
-        print("loogeed out")
         auth.logout(request)
         return redirect(home)
     else:
@@ -368,21 +367,25 @@ def add_address(request):
 def apply_coupon(request):
     if request.user.is_authenticated:
         if request.method == 'POST':
+            if request.session.has_key('coupon'):
+                return JsonResponse('active', safe=False)
             user = request.user
             name = request.POST['coupenCode']
+            total_amount = float(request.POST['total_amount'])
+
             if Coupon.objects.filter(name=name).exists():
                 coupon = Coupon.objects.get(name=name)
                 discount = coupon.discount
                 coupon_session = request.session['coupon'] = discount
-                return JsonResponse('validcoupen', safe=False)
+                discounted_price = total_amount - (total_amount*discount)/100
+                print(discounted_price)
+                return JsonResponse({'result': 'validcoupen', 'amount': discounted_price}, safe=False)
             else:
                 return JsonResponse('notvalidcoupen', safe=False)
 
             
     else:
         return redirect(login)
-
-        
 
 
 def user_payment(request, id):
@@ -430,23 +433,24 @@ def user_payment(request, id):
             address = ShippingAddress.objects.get(id=id)
             orderItem = OrderItem.objects.filter(user=user)
             get_total = 0
+            user_detail = UserDetail.objects.get(user=request.user) 
 
             if request.session.has_key('coupon'):
                 discount = request.session['coupon']
                 for x in orderItem:
                     get_total = x.get_total + get_total
-
                 get_total = get_total - (get_total*discount)/100
-                user_detail = UserDetail.objects.get(user=request.user) 
-                return render(request, 'User/payment.html',
-                            {'address': address, 'items': orderItem, 'total_price': get_total, 'user_detail':user_detail})
-
+                context = {
+                    'address': address, 'items': orderItem, 'total_price': get_total, 'user_detail':user_detail, 'coupon_active': "Coupon is active ..!"
+                }
+                return render(request, 'User/payment.html', context)
             else:
                 for x in orderItem:
                     get_total = x.get_total + get_total
-                user_detail = UserDetail.objects.get(user=request.user) 
-                return render(request, 'User/payment.html',
-                            {'address': address, 'items': orderItem, 'total_price': get_total, 'user_detail':user_detail})
+                context = {
+                    'address': address, 'items': orderItem, 'total_price': get_total, 'user_detail':user_detail
+                }
+                return render(request, 'User/payment.html', context)
     else:
         user = request.user
         cart = OrderItem.objects.filter(user=user)
@@ -463,18 +467,33 @@ def success_razorpay(request):
         address = ShippingAddress.objects.get(id=id)
         cart = OrderItem.objects.filter(user=user)
         get_total = 0
-        for x in cart:
-            get_total = x.get_total + get_total
-        for item in cart:
-            Order.objects.create(user=user, address=address, product=item.product, total_price=get_total, transaction_id=tid, 
-            date_ordered=date, payment_status='SUCCESS', payment_mode=mode, quantity=item.quantity, order_status='Placed')
 
-        cart.delete()
-        return JsonResponse('success', safe=False)
+        if request.session.has_key('coupon'):
+            discount = request.session['coupon']
+            for x in cart:
+                get_total = x.get_total + get_total
+            get_total = get_total - (get_total*discount)/100
+            for item in cart:
+                Order.objects.create(user=user, address=address, product=item.product, total_price=get_total, transaction_id=tid, 
+                date_ordered=date, payment_status='SUCCESS', payment_mode=mode, quantity=item.quantity, order_status='Placed')
+
+            del request.session['coupon']
+            cart.delete()
+            return JsonResponse('success', safe=False)
+        else:
+            for x in cart:
+                get_total = x.get_total + get_total
+            for item in cart:
+                Order.objects.create(user=user, address=address, product=item.product, total_price=get_total, transaction_id=tid, 
+                date_ordered=date, payment_status='SUCCESS', payment_mode=mode, quantity=item.quantity, order_status='Placed')
+
+            cart.delete()
+            return JsonResponse('success', safe=False)
+    else:
+        return redirect(login)
 
 
 def success_paypal(request):
-    print("gassallai asd honey ")
     if request.user.is_authenticated:
         date = datetime.datetime.now()
         user = request.user
@@ -484,15 +503,69 @@ def success_paypal(request):
         address = ShippingAddress.objects.get(id=id)
         cart = OrderItem.objects.filter(user=user)
         get_total = 0
-        for x in cart:
-            get_total = x.get_total + get_total
-        for item in cart:
-            Order.objects.create(user=user, address=address, product=item.product,
-                                 total_price=get_total,
-                                 transaction_id=tid, date_ordered=date, payment_status='SUCCESS',
-                                 payment_mode=mode, quantity=0, order_status='Placed')
-        cart.delete()
-        return JsonResponse('success', safe=False)
+
+        if request.session.has_key('coupon'):
+            discount = request.session['coupon']
+            for x in cart:
+                get_total = x.get_total + get_total
+            get_total = get_total - (get_total*discount)/100
+            for item in cart:
+                Order.objects.create(user=user, address=address, product=item.product,
+                                    total_price=get_total,
+                                    transaction_id=tid, date_ordered=date, payment_status='SUCCESS',
+                                    payment_mode=mode, quantity=0, order_status='Placed')
+            del request.session['coupon']
+            cart.delete()
+            return JsonResponse('success', safe=False)
+
+        else:
+            for x in cart:
+                get_total = x.get_total + get_total
+            for item in cart:
+                Order.objects.create(user=user, address=address, product=item.product,
+                                    total_price=get_total,
+                                    transaction_id=tid, date_ordered=date, payment_status='SUCCESS',
+                                    payment_mode=mode, quantity=0, order_status='Placed')
+            cart.delete()
+            return JsonResponse('success', safe=False)
+    else:
+        return redirect(login)
+
+def success_wallet(request):
+    if request.user.is_authenticated:
+        date = datetime.datetime.now()
+        user = request.user
+        mode = 'Vicgo Wallet'
+        id = request.POST['id']
+        tid = request.POST['tid']
+        address = ShippingAddress.objects.get(id=id)
+        cart = OrderItem.objects.filter(user=user)
+        get_total = 0
+
+        if request.session.has_key('coupon'):
+            discount = request.session['coupon']
+            for x in cart:
+                get_total = x.get_total + get_total
+            get_total = get_total - (get_total*discount)/100
+            for item in cart:
+                Order.objects.create(user=user, address=address, product=item.product,
+                                    total_price=get_total,
+                                    transaction_id=tid, date_ordered=date, payment_status='SUCCESS',
+                                    payment_mode=mode, quantity=0, order_status='Placed')
+            del request.session['coupon']
+            cart.delete()
+            return JsonResponse('success', safe=False)
+
+        else:
+            for x in cart:
+                get_total = x.get_total + get_total
+            for item in cart:
+                Order.objects.create(user=user, address=address, product=item.product,
+                                    total_price=get_total,
+                                    transaction_id=tid, date_ordered=date, payment_status='SUCCESS',
+                                    payment_mode=mode, quantity=0, order_status='Placed')
+            cart.delete()
+            return JsonResponse('success', safe=False)
     else:
         return redirect(login)
 
@@ -548,9 +621,10 @@ def cancel_order_user(request, id):
                                  total_price=x.total_price,
                                  transaction_id=x.transaction_id, date_ordered=x.date_ordered, payment_status=x.payment_status,
                                  payment_mode=x.payment_mode, quantity=0, order_status='Cancelled')
-        
-        user = UserDetail.objects.get(user=request.user)
-        user.wallet += total_price
-        user.save()
         order.delete()
         return redirect(view_order)
+
+    else:
+        return redirect(login)
+
+

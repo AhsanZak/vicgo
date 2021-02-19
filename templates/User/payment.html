@@ -42,7 +42,8 @@ Payment
                         </tbody>
                     </table>
                 </div>
-                <p style="color:black; font-weight:bold;">Total Amount = ${{total_price}}</p>
+                <p style="color:black; font-weight:bold; margin: 0; display: inline;" >Total Amount = $</p><p style="color:black; font-weight:bold; margin: 0; display: inline;"  id="total">{{total_price}}</p>
+                
             </div>
             <div class="col-md-4 p-2">
                 <!------coupon-------->
@@ -63,7 +64,7 @@ Payment
             <div class="col-md-8">
             </div>
             <div class="col-md-4">
-                <!----------------------------Deliver-TO-Previosly-USed-Addresses------------------------------>
+                <!--------------------Deliver-TO-Previosly-USed-Addresses--------------------->
                 <div class="container">
                     <div class="card p-2" style="width: auto; background-color: #FF5722">
                         <ul class="list-group list-group-flush">
@@ -72,31 +73,46 @@ Payment
                             <li class="list-group-item" style="color:black; font-weight:bold;">{{address.city}}</li>
                             <a style="text-align: center; background-color: #FF5722">Delivery Address</a>
                             <input type="text" id="address_id" hidden value="{{address.id}}">
-
                         </ul>
                     </div>
                 </div>
-                <!----------------------------//Deliver-TO-Previosly-USed-Addresses------------------------------>
+                <!-------------------//Deliver-TO-Previosly-USed-Addresses-------------------->
 
             </div>
         </div>
 
-        <p style="color:black">Payment Method :</p>
+        <h5 style="color: red;">{{coupon_active}}</h5>
+        <p style="color:black; font-weight: bold; font-size: large;">Payment Methods :</p>
         <div class="row">
             <div class="col-md-12">
                 <div style="display: flex;">
-                    <input type="radio" id="cod" name="mode" value="COD" required>
-                    <label for="cod">COD</label><br>
-                    <input type="radio" id="paypal" name="mode" value="Paypal" required>
-                    <label for="Paypal">Paypal</label><br>
-                    <input type="radio" id="razorpay" name="mode" value="Razorpay" required>
-                    <label for="razorpay">RazorPay</label><br>
+                    <div class="row">
+                        <div class="col-md-12">
+
+                            <input type="radio" id="wallet" name="mode" value="Wallet" required>
+                            <label for="Wallet" style="color: #FF5722;">Vicgo Wallet</label>&nbsp;<br>
+                        </div>
+                        <div class="col-md-12">
+                            <input type="radio" id="cod" name="mode" value="COD" required>
+                            <label for="cod" style="color: green;">COD</label><br>
+                        </div>
+                        <div class="col-md-12">
+                            <input type="radio" id="paypal" name="mode" value="Paypal" required>
+                            <label for="Paypal" style="color: orange;">Paypal</label><br>
+                        </div>
+                        <div class="col-md-12">
+                            <input type="radio" id="razorpay" name="mode" value="Razorpay" required>
+                    <label for="razorpay" style="color: orangered;">RazorPay</label><br>
+                        </div>
+                    </div>
+                    
+                    
                 </div>
             </div>
-            <div class="col-md-12">
-                <div>
-                    <div class="checkout-right-basket">
-                        <input style="width: 30vw;" id="order" type="button" value="Place Order" class="btn button2 ">
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="checkout-right-basket col-md-6" style="align-items: center;">
+                        <input style="background-color: green;" id="order" type="button" value="Place Order" class="btn button2 ">
                     </div>
                 </div>
             </div>
@@ -105,8 +121,6 @@ Payment
             </div>
             <input type="hidden" custom='Hidden Element' name="hidden">
         </div>
-
-
     </div>
 
 </div>
@@ -120,7 +134,7 @@ Payment
     integrity="sha256-xNzN2a4ltkB44Mc/Jz3pT4iU1cmeR0FkXs4pru/JxaQ=" crossorigin="anonymous"></script>
 
 <script>
-
+    var amount = 0  
     function paypal(tid) {
         paypal_sdk.Buttons({
 
@@ -170,7 +184,7 @@ Payment
     }
 
 
-    var amount = 0
+
     $('#order').click(function () {
         let id = $('#address_id').val()
         var userData = {
@@ -201,10 +215,38 @@ Payment
                     razorpay(tid)
                     amount = data.amount
                 }
+                else if (data.mode == 'Wallet') {
+                    console.log(data.mode)
+                    tid = data.tid
+                    wallet(tid)
+                }
             }
         });
     });
 
+
+    function wallet(tid) {
+        let amount = $('#wallet_amount').val()
+        console.log("sahjkfdhfajkdsfjakgakas")
+        console.log(amount)
+        var userData = {
+            csrfmiddlewaretoken: '{{ csrf_token }}',
+            tid: tid,
+            id: $('#address_id').val()
+        }
+        $.ajax({
+            url: '/success-wallet/',
+            type: "POST",
+            data: userData,
+            dataType: "json",
+            success: function (data) {
+                if (data == 'success') {
+                    alert('Transaction completed. Paid through Vicgo Wallet !');
+                    window.location.replace("/")
+                }
+            }
+        });
+    }
 
     function razorpay(tid) {
         console.log(tid)
@@ -264,12 +306,15 @@ Payment
 
    $('#coupen_btn').click(function () {
         let coupen = $('#coupen').val()
+        let total_amount = '{{total_price}}'
+        console.log(total_amount)
         var coupenInfo = {
             csrfmiddlewaretoken: '{{csrf_token}}',
-            coupenCode: coupen
+            coupenCode: coupen,
+            total_amount: total_amount
         }
         if (coupen == '') {
-            $('#coupenmsg').html('Enter An Coupon Code')
+            $('#coupenmsg').html('Enter Coupon Code .!')
         }
         else {
             $.ajax({
@@ -278,11 +323,15 @@ Payment
                 data: coupenInfo,
                 dataType: 'JSON',
                 success: function (data) {
-                    if (data == 'validcoupen'){
+                    if (data.result == 'validcoupen'){
                         $('#coupenmsg').html('Coupen is valid')
+                        $('#total').html(data.amount)
                     }
                     else if(data == 'notvalidcoupen'){
                         $('#coupenmsg').html('Coupen is not valid')
+                    }
+                    else if(data == 'active'){
+                        $('#coupenmsg').html('Coupon is Already Active')
                     }
                 }
             })

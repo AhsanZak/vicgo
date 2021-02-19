@@ -105,9 +105,9 @@
                                         <th>No.</th>
                                         <th>Transaction ID</th>
                                         <th>Name</th>
-                                        <th>Address</th>
                                         <th>Ordered On</th>
                                         <th>Amount</th>
+                                        <th>Refund Status</th>
                                         <th>Order Status</th>
                                         <th>Payment Method</th>
                                     </tr>
@@ -118,9 +118,13 @@
                                         <td>{{forloop.counter}}</td>
                                         <td>{{x.transaction_id}}</td>
                                         <td>{{x.user.first_name}}</td>
-                                        <td>{{x.address.address}} ,{{x.address.city}},{{x.address.state}}</td>
                                         <td>{{x.date_ordered}}</td>
                                         <td>{{x.total_price}}</td>
+                                        {% if x.refund == True %}
+                                        <td>Refunded</td>
+                                        {% else %}
+                                        <td>Pending</td>
+                                        {% endif %}
                                         <td>{{x.order_status}}</td>
                                         <td>{{x.payment_mode}}</td>
 
