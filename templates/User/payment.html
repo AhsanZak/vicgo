@@ -88,7 +88,7 @@ Payment
                 <div style="display: flex;">
                     <div class="row">
                         <div class="col-md-12">
-
+                            <span style="color: red; font-weight: bold;" id="walletmsg" ></span><br>
                             <input type="radio" id="wallet" name="mode" value="Wallet" required>
                             <label for="Wallet" style="color: #FF5722;">Vicgo Wallet</label>&nbsp;<br>
                         </div>
@@ -243,6 +243,9 @@ Payment
                 if (data == 'success') {
                     alert('Transaction completed. Paid through Vicgo Wallet !');
                     window.location.replace("/")
+                }
+                else if (data == 'failed') {
+                    $('#walletmsg').html('Insufficient Balance')
                 }
             }
         });

@@ -21,7 +21,10 @@ def home(request):
     category = Category.objects.all()
     if request.user.is_authenticated:
         user_detail = UserDetail.objects.filter(user=request.user)
-        return render(request, 'User/index.html', {'products': products, 'category': category, 'user': request.user, 'user_detail':user_detail})
+        context = {
+            'products': products, 'category': category, 'user': request.user, 'user_detail':user_detail
+        }
+        return render(request, 'User/index.html', context)
     else:
         return render(request, 'User/index.html', {'products': products, 'category': category})
 
@@ -473,22 +476,37 @@ def success_razorpay(request):
             for x in cart:
                 get_total = x.get_total + get_total
             get_total = get_total - (get_total*discount)/100
-            for item in cart:
-                Order.objects.create(user=user, address=address, product=item.product, total_price=get_total, transaction_id=tid, 
-                date_ordered=date, payment_status='SUCCESS', payment_mode=mode, quantity=item.quantity, order_status='Placed')
-
             del request.session['coupon']
-            cart.delete()
-            return JsonResponse('success', safe=False)
         else:
             for x in cart:
                 get_total = x.get_total + get_total
-            for item in cart:
-                Order.objects.create(user=user, address=address, product=item.product, total_price=get_total, transaction_id=tid, 
-                date_ordered=date, payment_status='SUCCESS', payment_mode=mode, quantity=item.quantity, order_status='Placed')
 
-            cart.delete()
-            return JsonResponse('success', safe=False)
+        for item in cart:
+            Order.objects.create(user=user, address=address, product=item.product, total_price=get_total, transaction_id=tid, 
+            date_ordered=date, payment_status='SUCCESS', payment_mode=mode, quantity=item.quantity, order_status='Placed')
+
+        cart.delete()
+        return JsonResponse('success', safe=False)
+    else:
+        return redirect(login)
+
+
+def view_wallet(request):
+    if request.user.is_authenticated:
+        orders = Order.objects.filter(payment_mode='Wallet')
+        order_dict = {}
+        for x in orders:
+            if not x.transaction_id in order_dict.keys():
+                order_dict[x.transaction_id] = x
+                order_dict[x.transaction_id].order_price = order_dict[x.transaction_id].total_price
+            else:
+                order_dict[x.transaction_id].order_price += order_dict[x.transaction_id].total_price
+
+        user_detail = UserDetail.objects.get(user=request.user)
+        context = {
+            'order_dict': order_dict, 'user_detail': user_detail
+        }
+        return render(request, 'User/view_wallet.html', context)
     else:
         return redirect(login)
 
@@ -509,30 +527,28 @@ def success_paypal(request):
             for x in cart:
                 get_total = x.get_total + get_total
             get_total = get_total - (get_total*discount)/100
-            for item in cart:
-                Order.objects.create(user=user, address=address, product=item.product,
-                                    total_price=get_total,
-                                    transaction_id=tid, date_ordered=date, payment_status='SUCCESS',
-                                    payment_mode=mode, quantity=0, order_status='Placed')
             del request.session['coupon']
-            cart.delete()
-            return JsonResponse('success', safe=False)
-
         else:
             for x in cart:
                 get_total = x.get_total + get_total
-            for item in cart:
-                Order.objects.create(user=user, address=address, product=item.product,
-                                    total_price=get_total,
-                                    transaction_id=tid, date_ordered=date, payment_status='SUCCESS',
-                                    payment_mode=mode, quantity=0, order_status='Placed')
-            cart.delete()
-            return JsonResponse('success', safe=False)
+        for item in cart:
+            Order.objects.create(user=user, address=address, product=item.product,
+                                total_price=get_total,
+                                transaction_id=tid, date_ordered=date, payment_status='SUCCESS',
+                                payment_mode=mode, quantity=0, order_status='Placed')
+        cart.delete()
+        return JsonResponse('success', safe=False)
     else:
         return redirect(login)
 
+
 def success_wallet(request):
+    print('sadfhukujghky')
     if request.user.is_authenticated:
+        user_detail = UserDetail.objects.get(user=request.user)
+        wallet_balance = user_detail.wallet
+        print("Wallet Balance ", wallet_balance)
+
         date = datetime.datetime.now()
         user = request.user
         mode = 'Vicgo Wallet'
@@ -545,27 +561,26 @@ def success_wallet(request):
         if request.session.has_key('coupon'):
             discount = request.session['coupon']
             for x in cart:
-                get_total = x.get_total + get_total
-            get_total = get_total - (get_total*discount)/100
-            for item in cart:
-                Order.objects.create(user=user, address=address, product=item.product,
-                                    total_price=get_total,
-                                    transaction_id=tid, date_ordered=date, payment_status='SUCCESS',
-                                    payment_mode=mode, quantity=0, order_status='Placed')
+                total = x.get_total + get_total
+            total = total - (total*discount)/100
+            print("total", total)
             del request.session['coupon']
-            cart.delete()
-            return JsonResponse('success', safe=False)
-
         else:
+            print('elsseeeeeee',cart)
             for x in cart:
-                get_total = x.get_total + get_total
-            for item in cart:
-                Order.objects.create(user=user, address=address, product=item.product,
-                                    total_price=get_total,
-                                    transaction_id=tid, date_ordered=date, payment_status='SUCCESS',
-                                    payment_mode=mode, quantity=0, order_status='Placed')
-            cart.delete()
-            return JsonResponse('success', safe=False)
+                print('looppp')
+                total = x.get_total + get_total
+                print("total", total)
+
+        # print("total", total)
+
+        for item in cart:
+            Order.objects.create(user=user, address=address, product=item.product,
+                                total_price=get_total,
+                                transaction_id=tid, date_ordered=date, payment_status='SUCCESS',
+                                payment_mode=mode, quantity=0, order_status='Placed')
+        cart.delete()
+        return JsonResponse('success', safe=False)    
     else:
         return redirect(login)
 
@@ -581,7 +596,6 @@ def view_order(request):
                 order_dict[x.transaction_id].order_price = order_dict[x.transaction_id].total_price
             else:
                 order_dict[x.transaction_id].order_price += order_dict[x.transaction_id].total_price
-        print(order_dict)
         user_detail = UserDetail.objects.get(user=request.user)
 
         cancel_order = CancelledOrder.objects.filter(user=user)

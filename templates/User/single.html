@@ -117,10 +117,10 @@ Single
 							<h5 class="sp_title">Services:</h5>
 							<ul class="single_serv">
 								<li>
-									<a href="#">30 Day Return Policy</a>
+									<a href="">30 Day Return Policy</a>
 								</li>
 								<li class="gap">
-									<a href="#">Cash on Delivery available</a>
+									<a href="">Cash on Delivery available</a>
 								</li>
 							</ul>
 						</div>
@@ -169,19 +169,10 @@ Single
 	<!-- /products-->
 	<div class="ecom-contenthny py-5">
 		<div class="container py-lg-5">
-		<div style="margin: 8px auto; display: block; text-align:center;">
-
-<!---728x90--->
-
- 
-</div>
+		<div style="margin: 8px auto; display: block; text-align:center;"></div>
 			<h3 class="hny-title mb-0 text-center">Related <span>Products</span></h3>
 			<p class="text-center">Same Category products you may like</p>
-			<div style="margin: 8px auto; display: block; text-align:center;">
-
-<!---728x90--->
- 
-</div>
+			<div style="margin: 8px auto; display: block; text-align:center;"></div>
 			<!-- /row-->
 			<div class="ecom-products-grids row mt-lg-5 mt-3">
 				{% for products in category_product %}
@@ -189,20 +180,18 @@ Single
 					<div class="product-grid2">
 						<div class="product-image2">
 							<a href="{% url 'single' products.id %}">
-								<img class="pic-1 img-fluid" src="{{products.ImageURL}}">
-								<img class="pic-2 img-fluid" src="{{products.ImageURL}}">
+								<img class="pic-1 img-fluid" style="height: 21em; width: 20em;" src="{{products.ImageURL}}">
+								<img class="pic-2 img-fluid" style="height: 21em; width: 20em;" src="{{products.ImageURL}}">
 							</a>
 							<ul class="social">
 									<li><a href="{% url 'single' products.id %}" data-tip="Quick View"><span class="fa fa-eye"></span></a></li>
-
-									<li><a href="{% url 'add_cart' product.id %}" data-tip="Add to Cart"><span class="fa fa-shopping-bag"></span></a>
-									</li>
+									<li><a href="{% url 'add_cart' product.id %}" data-tip="Add to Cart"><span class="fa fa-shopping-bag"></span></a></li>
 							</ul>
 							<div class="transmitv single-item">
-											<button type="submit" class="transmitv-cart ptransmitv-cart add-to-cart">
-										<a href="{% url 'add_cart' product.id %}" style="color:white">Add to Cart</a>
-									</button>
-									</div>
+									<button type="submit" class="transmitv-cart ptransmitv-cart add-to-cart">
+								<a href="{% url 'add_cart' product.id %}" style="color:white">Add to Cart</a>
+							</button>
+							</div>
 						</div>
 						<div class="product-content">
 							<h3 class="title"><a href="{% url 'single' products.id %}">{{products.product_name}}</a></h3>

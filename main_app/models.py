@@ -62,7 +62,7 @@ class ProductImages(models.Model):
         return url
 
 
-class offer(models.Model):
+class Offer(models.Model):
     category = models.ForeignKey(Category,on_delete=models.CASCADE,null=True)
     product = models.ForeignKey(ProductDetail,on_delete=models.CASCADE,null=True)
     offer_name = models.CharField(max_length=20,null=True,blank=True)

@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block title %}
-Home
+Home 
 {% endblock %}
 
 {% block content %}
@@ -13,7 +13,7 @@ Home
 	<div class="grids-hny-2-mian py-5" style="">
 		<div class="container py-lg-5">
 
-			<h3 class="hny-title mb-0 text-center"><span>C</span>ategories</h3>
+			<h3 class="hny-title mb-0 text-center"><span>C</span>ategories{{user_detail.name}}</h3>
 			<p class="mb-4 text-center">Handpicked Favourites just for you</p>
 			<div class="welcome-grids row mt-5">
 			{% for items in category %}
@@ -66,7 +66,14 @@ Home
 						</div>
 						<div class="product-content">
 							<h3 class="title"><a href="{% url 'single' product.id %}">{{product.product_name}} </a></h3>
-							<span class="price"><del></del>${{product.product_price}}</span>
+							<span class="price">${{product.product_price}}</span>
+								{% if product.offer_price == 0 %}
+								
+								{% else %}
+								<del>
+									${{product.offer_price}}
+								</del>
+								{% endif %}
 						</div>
 					</div>
 				</div>

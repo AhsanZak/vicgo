@@ -267,7 +267,6 @@ def add_refferal(request):
         return redirect(admin_login)
 
 
-
 def delete_refferal(request, id):
     if request.session.has_key('password'):
         reff = RefferalOffer.objects.get(id=id)
@@ -275,6 +274,7 @@ def delete_refferal(request, id):
         return redirect(manage_refferal)
     else:
         return redirect(admin_login)
+
 
 def delete_product(request, product_id):
     if request.session.has_key('password'):
@@ -476,6 +476,85 @@ def order_report(request):
         return render(request, 'AdminPanel/order_report.html', {'total_order': total_order,
                                                      'table_data': order_dict, 'total_sales': dict2,
                                                      'total_amount': total_amount})
+
+
+def manage_offer(request):
+    if request.session.has_key('password'):
+        offer = Offer.objects.all()
+        return render(request, 'AdminPanel/manage_offer.html', {'offers': offer})
+    else:
+        return redirect(admin_login)
+
+
+def add_offer(request):
+    if request.session.has_key('password'):
+        categories = Category.objects.all()
+        products = ProductDetail.objects.all()
+
+        if request.method == 'POST':
+            offer_type = request.POST['offer_type']
+            offer_name = request.POST['offer_name']        
+            category_id = request.POST['category']
+            product_id = request.POST['product']
+            discount_percentage = int(request.POST['discount_amount'])
+            offer_starts = request.POST['offer_start']
+            offer_ends = request.POST['offer_ends']
+            product = ProductDetail.objects.get(id=product_id)
+            if offer_type == 'single':
+                real_price = product.product_price
+                product.offer_price = real_price
+                product.product_price =  real_price - (real_price * discount_percentage/100)
+                product.offer_percentage = discount_percentage
+                product.save()
+                Offer.objects.create(offer_name=offer_name,product=product,discount_amount=discount_percentage,offer_start=offer_starts,
+                                    offer_expiry=offer_ends,offer_type=offer_type)
+            else:
+                category = Category.objects.get(id=category_id)
+                products = ProductDetail.objects.filter(product_category=category)
+                for product in products:
+                    real_price = product.product_price
+                    product.offer_price = real_price
+                    product.product_price = real_price - (real_price * discount_percentage/100)
+                    product.offer_percentage = discount_percentage
+                    product.save()
+                Offer.objects.create(offer_name=offer_name,product=product,category=category,discount_amount=discount_percentage,
+                                    offer_start=offer_starts,offer_expiry=offer_ends,offer_type=offer_type)
+            return redirect(manage_offer)
+        else:
+            context = {'categories':categories, 'products':products }
+            return render(request, 'AdminPanel/add_offer.html', context)
+    else:
+        return redirect(admin_login)
+
+
+def delete_offer(request, id):
+    if request.user.is_authenticated:
+        offers = Offer.objects.get(id=id)
+        if offers.offer_type == 'single':
+            product_id = offers.product.id
+            product = ProductDetail.objects.get(id=product_id)
+
+            offer_price = product.product_price
+            real_price = product.offer_price
+
+            product.price = real_price
+            product.offer_price = 0
+            product.save()
+            offers.delete()
+        else:
+            category_id = offers.category
+            category = Category.objects.get(id=category_id.id)
+            products = ProductDetail.objects.filter(product_category=category)
+            for product in products:
+                offer_price = product.product_price
+                real_price = product.offer_price
+                product.price = real_price
+                product.offer_price = 0
+                product.save()
+            offers.delete()
+        return redirect(manage_offer)
+    else:
+        return redirect(admin_login)
 
 
 def pending_order(request):

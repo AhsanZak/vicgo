@@ -13,6 +13,7 @@ urlpatterns = [
     path('user-setprofile/', views.edit_user_profile, name="edit_userProfile"),
 
     path('category-item/<int:item_id>/', views.category_item, name="category_item"),
+    path('view-wallet/', views.view_wallet, name="view_wallet"),
 
     path('add-cart/<int:id>/', views.add_cart, name="add_cart"),
     path('cart', views.cart, name="cart"),
