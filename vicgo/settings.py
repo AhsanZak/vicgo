@@ -83,6 +83,7 @@ AUTHENTICATION_BACKENDS = (
     'social_core.backends.facebook.FacebookOAuth2',
     'social_core.backends.twitter.TwitterOAuth',
     'social_core.backends.github.GithubOAuth2',
+    'social_core.backends.google.GoogleOAuth2',
 
     'django.contrib.auth.backends.ModelBackend',
 )
@@ -94,6 +95,10 @@ LOGIN_REDIRECT_URL = 'home'
 
 SOCIAL_AUTH_FACEBOOK_KEY = '263269715158950' 
 SOCIAL_AUTH_FACEBOOK_SECRET = '70b58339b6881e599b89ba1f45b9b676' 
+
+
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '21702595792-hp6endfvni2q5dahocd2sgi5so2rn8mu.apps.googleusercontent.com' 
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = 'kRHhIVL6BdN6kidBThzp-QgM' 
 
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases

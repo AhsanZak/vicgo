@@ -72,7 +72,6 @@ class Offer(models.Model):
     offer_type = models.CharField(null=True,blank=True,max_length=40)
 
 
-
 class RefferalOffer(models.Model):
     reff_name = models.CharField(null=True, max_length=225)
     reff_discount = models.IntegerField(null=True)

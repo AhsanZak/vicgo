@@ -28,7 +28,6 @@ urlpatterns = [
     path('success-paypal/', views.success_paypal, name="success_paypal"),
     path('success-wallet/', views.success_wallet, name="success_wallet"),
 
-
     path('view-order/', views.view_order, name="view_order"),
     path('order-items/', views.order_items, name="order_items"),
     path('cancel-order/<str:id>/', views.cancel_order_user, name="cancel_order_user"),
